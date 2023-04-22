@@ -1,0 +1,30 @@
+package garcia.ruben.personal_project.entities;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.geo.Point;
+
+//used for google maps place id; if id is saved peformance is better;
+//for directions google maps destinations can do a lookup based on input strings
+@Entity
+@Table(name="Location")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+public class Location {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Column(unique = true)
+    private String googleMapsPlaceId;
+
+    @Column(name ="coordinates", columnDefinition = "POINT")
+    private Point coordinates;
+
+}
