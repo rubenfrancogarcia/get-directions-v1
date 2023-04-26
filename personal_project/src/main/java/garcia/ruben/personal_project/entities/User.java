@@ -16,20 +16,20 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(columnDefinition = "firstName")
+    @Column
     private String firstName;
 
-    @Column(columnDefinition = "lastName")
+
     private String lastName;
 
-    @Column(columnDefinition = "email", unique = true)
+    @Column( unique = true)
     private String email;
 
-    @Column(unique = true, columnDefinition = "phoneNumber")
+    @Column(unique = true)
     private String phoneNumber;
 
 
-    @Column(columnDefinition = "username", unique = true)
+    @Column(unique = true)
     private String username;
 
     @OneToOne(mappedBy="user")

@@ -18,7 +18,7 @@ public class UserData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private int id;
-
+    //todo figure out how to have them all across the same table in userdata
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
