@@ -14,7 +14,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(columnDefinition = "firstName")
     private String firstName;
@@ -32,7 +32,7 @@ public class User {
     @Column(columnDefinition = "username", unique = true)
     private String username;
 
-    @OneToOne(mappedBy = "UserData", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name="userDataId", referencedColumnName = "userid")
+    @OneToOne
+    @PrimaryKeyJoinColumn(referencedColumnName = "id")
     private UserData userData;
 }

@@ -1,10 +1,7 @@
 package garcia.ruben.personal_project.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.geo.Point;
 
 //used for google maps place id; if id is saved peformance is better;
@@ -15,6 +12,7 @@ import org.springframework.data.geo.Point;
 @NoArgsConstructor
 @Getter
 @Setter
+@Data
 public class Location {
 
     @Id

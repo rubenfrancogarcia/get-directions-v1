@@ -2,15 +2,14 @@ package garcia.ruben.personal_project.entities;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
-@Table(name="UserData")
+@Data
+@Table(name="userdata")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -19,35 +18,31 @@ public class UserData {
     @GeneratedValue(strategy =GenerationType.IDENTITY)
     @Id
     private int id;
-    @OneToOne
-    @Column
+
+    @OneToOne(mappedBy = "User.id", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private int userId;
 
     @Column
     @ElementCollection
     @Enumerated(EnumType.STRING)
-    private List<String> keywordsLikes;
+    private Set<String> keywordsLikes;
 
     @Column
     @ElementCollection
     @Enumerated(EnumType.STRING)
-    private List<String> keywordsDislikes;
+    private Set<String> keywordsDislikes;
 
-    @ElementCollection
-    @CollectionTable(name="Location", joinColumns = @JoinColumn(name="id"))
-    @OneToMany(mappedBy = "location", fetch= FetchType.LAZY)
-    @Column(name="savedRoutes")
+    @ManyToMany
+    @JoinTable(
+            name="user_location",
+            joinColumns=@JoinColumn(name="user_id", referencedColumnName="id"),
+            inverseJoinColumns=@JoinColumn(name="location_id", referencedColumnName="id"))
     private List<Location[]> savedRoutes;
+    @Column
+    @ElementCollection
+    private Set<Location> locationsOfInterest;
 
     @ElementCollection
-    @CollectionTable(name="Location", joinColumns = @JoinColumn(name="id"))
-    @OneToMany(mappedBy = "location", fetch= FetchType.LAZY)
     @Column
-    private List<Location> locationsOfInterest;
-
-    @ElementCollection
-    @CollectionTable(name="Location", joinColumns = @JoinColumn(name="id"))
-    @OneToMany(mappedBy = "location", fetch= FetchType.LAZY)
-    @Column
-    private List<Location> locationsVisited;
+    private Set<Location> locationsVisited;
 }
