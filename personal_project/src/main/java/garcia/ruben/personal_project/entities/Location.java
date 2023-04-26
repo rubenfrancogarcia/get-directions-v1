@@ -22,7 +22,8 @@ public class Location {
     @Column(unique = true)
     private String googleMapsPlaceId;
 
-    @Column(name ="coordinates", columnDefinition = "POINT")
-    private Point coordinates;
+    private Double latitude;
+
+    private Double longitude;
 
 }

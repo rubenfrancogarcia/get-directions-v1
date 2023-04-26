@@ -32,7 +32,6 @@ public class User {
     @Column(columnDefinition = "username", unique = true)
     private String username;
 
-    @OneToOne
-    @PrimaryKeyJoinColumn(referencedColumnName = "id")
+    @OneToOne(mappedBy="user")
     private UserData userData;
 }
