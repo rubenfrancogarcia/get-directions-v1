@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Table(name = "user")
+@Table(name = "users")
 @Entity
 @Data
 @AllArgsConstructor
@@ -32,6 +32,6 @@ public class User {
     @Column(unique = true)
     private String username;
 
-    @OneToOne(mappedBy="user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserData userData;
 }

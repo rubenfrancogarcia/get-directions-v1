@@ -1,11 +1,11 @@
 package garcia.ruben.personal_project.entities;
 
+import garcia.ruben.personal_project.utility.Keywords;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.*;
 
 @Entity
 @Data
@@ -14,32 +14,31 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserData {
+public class UserData implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private int id;
-    //todo figure out how to have them all across the same table in userdata
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
+    @Lob
+    @Column(columnDefinition = "text")
+    private Set<Keywords> keywordsLikes = new HashSet<>();
 
-    @ElementCollection
-    @Enumerated(EnumType.STRING)
-    private Set<String> keywordsLikes;
+    @Lob
+    @Column(columnDefinition = "text")
+    private Set<Keywords> keywordsDislikes = new HashSet<>();
 
-    @ElementCollection
-    @Enumerated(EnumType.STRING)
-    private Set<String> keywordsDislikes;
+    @Lob
+    @Column(columnDefinition = "text")
+    private List<LinkedList<String>> savedRoutes = new ArrayList<>();
 
-    @ElementCollection
-    private List<LinkedList<String>> savedRoutes;
+    @Lob
+    @Column(columnDefinition = "text")
+    private Set<String> locationsOfInterest = new HashSet<>();
 
-    @ElementCollection(targetClass = Location.class)
-    @OneToMany(cascade = CascadeType.ALL)
-    private Set<Location> locationsOfInterest;
-
-    @ElementCollection(targetClass = Location.class)
-    @OneToMany(cascade = CascadeType.ALL)
-    private Set<Location> locationsVisited;
+    @Lob
+    private Set<String> locationsVisited = new HashSet<>();
 }
