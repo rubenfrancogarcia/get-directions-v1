@@ -1,6 +1,6 @@
 package garcia.ruben.personal_project.entities;
 
-import garcia.ruben.personal_project.utility.Keywords;
+import garcia.ruben.personal_project.utility.data.Keywords;
 import jakarta.persistence.*;
 import lombok.*;
 

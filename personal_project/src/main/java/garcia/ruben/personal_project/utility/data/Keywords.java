@@ -1,4 +1,4 @@
-package garcia.ruben.personal_project.utility;
+package garcia.ruben.personal_project.utility.data;
 
 public enum Keywords {
     Nature("nature"),

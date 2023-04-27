@@ -1,4 +1,4 @@
-package garcia.ruben.personal_project.utility;
+package garcia.ruben.personal_project.utility.security;
 
 
 import org.springframework.context.annotation.Bean;
