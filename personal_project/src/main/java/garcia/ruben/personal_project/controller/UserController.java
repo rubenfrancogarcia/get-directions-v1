@@ -1,8 +1,8 @@
 package garcia.ruben.personal_project.controller;
 
-import garcia.ruben.personal_project.pojos.LoginUserPojo;
-import garcia.ruben.personal_project.pojos.OnboardUserPojo;
-import garcia.ruben.personal_project.pojos.UserDataPojo;
+import garcia.ruben.personal_project.pojos.users.LoginUserPojo;
+import garcia.ruben.personal_project.pojos.users.OnboardUserPojo;
+import garcia.ruben.personal_project.pojos.users.UserDataPojo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
