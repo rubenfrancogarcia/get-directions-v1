@@ -1,21 +1,28 @@
 package garcia.ruben.personal_project.services.location;
 
+import com.google.maps.GeoApiContext;
+import com.google.maps.PlacesApi;
 import garcia.ruben.personal_project.entities.Location;
-import okhttp3.*;
+import garcia.ruben.personal_project.utility.google.GoogleMapsCommon;
 import org.apache.logging.log4j.LogManager;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
 import java.util.logging.Logger;
 
 public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterface {
     private static final Logger logger = (Logger) LogManager.getLogger(GoogleMapsLocationsWebAppImpl.class);
-    @Value("${google.maps.api.key}")
-    private String googleMapsApiKey;
+    @Autowired
+    private GoogleMapsCommon GoogleMapsCommon;
+    private GeoApiContext geoApiContext;
+    private PlacesApi placesApi;
+
+    public GoogleMapsLocationsWebAppImpl() {
+        geoApiContext = GoogleMapsCommon.setupGeoApiContext();
+    }
 
     @Override
     public void saveLocation() {
-        OkHttpClient client = new OkHttpClient().newBuilder()
+        /*OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         MediaType mediaType = MediaType.parse("text/plain");
         RequestBody body = RequestBody.create(mediaType, "");
@@ -28,7 +35,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
             logger.info("response to calling google maps api sample url " + response);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
+        }*/
         //https://maps.googleapis.com/maps/api/place/findplacefromtext/json?parameters
         //: "restaurant" or "123 Main Street". This must be a place name, address, or category of establishments.
         //the type of input. This can be one of either textquery or phonenumber. Phone numbers must be in international format
