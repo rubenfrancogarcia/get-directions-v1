@@ -1,0 +1,306 @@
+{
+  "geocoded_waypoints": [
+    {
+      "geocoder_status": "OK",
+      "place_id": "ChIJE5XFE9ohTIYRK2DNiWQDqmI",
+      "types": [
+        "locality",
+        "political"
+      ]
+    },
+    {
+      "geocoder_status": "OK",
+      "partial_match": true,
+      "place_id": "ChIJS5dFe_cZTIYRj2dH9qSb7Lk",
+      "types": [
+        "locality",
+        "political"
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "bounds": {
+        "northeast": {
+          "lat": 33.0197879,
+          "lng": -96.6988609
+        },
+        "southwest": {
+          "lat": 32.7725003,
+          "lng": -96.79795209999999
+        }
+      },
+      "copyrights": "Map data ©2023 Google",
+      "legs": [
+        {
+          "distance": {
+            "text": "20.1 mi",
+            "value": 32428
+          },
+          "duration": {
+            "text": "25 mins",
+            "value": 1503
+          },
+          "end_address": "Dallas, TX, USA",
+          "end_location": {
+            "lat": 32.7759428,
+            "lng": -96.7967532
+          },
+          "start_address": "Plano, TX, USA",
+          "start_location": {
+            "lat": 33.0196876,
+            "lng": -96.6988609
+          },
+          "steps": [
+            {
+              "distance": {
+                "text": "0.6 mi",
+                "value": 1029
+              },
+              "duration": {
+                "text": "3 mins",
+                "value": 185
+              },
+              "end_location": {
+                "lat": 33.0197835,
+                "lng": -96.70987559999999
+              },
+              "html_instructions": "Head <b>west</b> on <b>E 15th St</b> toward <b>K Ave</b>",
+              "polyline": {
+                "points": "adphEznemQ@J?V?f@@tA?lA@tC?J?JAlAAlBA~B?~@?bCAzB?lB?l@M`@?nEAxA?n@?t@?rA?n@?ZA~@?z@?b@?v@?bA?L?L?R?f@@^"
+              },
+              "start_location": {
+                "lat": 33.0196876,
+                "lng": -96.6988609
+              },
+              "travel_mode": "DRIVING"
+            },
+            {
+              "distance": {
+                "text": "0.1 mi",
+                "value": 164
+              },
+              "duration": {
+                "text": "1 min",
+                "value": 21
+              },
+              "end_location": {
+                "lat": 33.0183522,
+                "lng": -96.70946599999999
+              },
+              "html_instructions": "Turn <b>left</b> onto <b>N Central Expy</b>",
+              "maneuver": "turn-left",
+              "polyline": {
+                "points": "sdphEvsgmQZEbAUVEdDo@"
+              },
+              "start_location": {
+                "lat": 33.0197835,
+                "lng": -96.70987559999999
+              },
+              "travel_mode": "DRIVING"
+            },
+            {
+              "distance": {
+                "text": "16.6 mi",
+                "value": 26692
+              },
+              "duration": {
+                "text": "16 mins",
+                "value": 972
+              },
+              "end_location": {
+                "lat": 32.7985976,
+                "lng": -96.7931577
+              },
+              "html_instructions": "Take the ramp on the <b>left</b> onto <b>US-75 S</b>",
+              "maneuver": "ramp-left",
+              "polyline": {
+                "points": "u{ohEdqgmQTO`@Mp@QJERENEtAUNCb@Kf@GHABAr@MZGXEPE`@Ef@E`@GLA@?@AFSx@Cj@APAzAEXANAT?@?TATAj@Cl@AFAF?XAVAP?TAT?TA@?VARAT?XAB?L?V?R?DAP?j@?x@C^ATAV?TARATAT?VARAJ?HAT?VATATAPAB?lBGT?VATARATAR?l@CTAT?TAD?l@AR?P?R?T?T?L?F?V@T?R@P?B@T@T@L?F@j@DP@n@FR@TBTBTBVBV@h@FL@L@VBZBPBJ@h@Db@@R@RBT@T@j@DTBX@RBT@TB@?R@T@TBTBT@P@VBTBV@RBVBP@XBR@`AHVBR@j@Dj@DRB@?TBR@TBd@BD@L@\\BT@~@HH@N@|@F~@Hb@DJ@R@ZBd@DT@TBT@TBRBV@l@Dh@FT@\\B`@DT@l@FT@r@Fb@BPBV@L@F@f@DXBR@VBT@j@FT@hAJL@\\@bAH`@DTBT@TBT@TBR@TBN@F@j@DD?b@DD?N@RBR@ZB`@D~@FH@h@DL@^BXBP@f@FD?N@TBTBL@D@PBZBTDVBRDNB\\Dz@Nj@LTDNBD@l@NpAZj@NTHb@LTHRFVHPFRHPFVJl@RpBr@XJRHRFRHTHRHRFRHTHRHTHD@`@N@?PFf@Pf@RTHTHTHRHRFRHTHh@Pf@RRFTHRHRFTHRHf@P|@Z|@Zh@Rf@RnAb@j@RRHRFTHRHTHRFLFXJ`A\\b@NRHTHPFTH~@\\PFPFTHz@Zf@P\\N^NPFB@^PVJXLPH\\PLFb@TRJRJRLf@VPJPJp@^\\RRJPJd@VRJRJRLRJNJTJf@XPJf@XTJPJPJh@Zx@b@FDHDv@b@RJ`B|@RJf@Xd@Vh@ZPHb@VdCrATLRLd@VRLPHTLRJPJd@Vv@b@TLz@d@b@XXPJFRLb@XRLd@\\b@ZRLb@^PL@Bb@\\`@\\NLNNRPNLRRLJPP`@b@`@b@LNB@NP^`@NPPR^b@NPJLDDJJPTNNNRJJNRRTl@p@NP`@d@Z^PR\\^RVLNNNPTJLZ\\BBRTLLRV\\^PRJLNPPPXXRRFFNNp@h@TTLLh@d@ZXr@j@b@^b@ZbAp@h@\\d@Zf@XRLTLNHVLRLRJPJRJDBLHf@VRLx@b@@@vC`B@?xAx@VLPJPJD@JHB@NHB@B@hCvAn@^l@\\d@XRLRJPJPJFB|@h@DBvAv@xC`B\\RRJPJRJv@b@VLHFRLd@T`@TTNRJZN`@VVL?@PHhBbAl@^d@XBB\\TDBp@b@TPTNTPNLZVXT\\XDD`@Zd@b@`@^`@`@`@`@`@b@XZTVLNPRNP^b@Zb@VZZb@Z`@LRNRTZFHLPLPNRLP\\d@RVJLV^TXZb@NPFJ@BDFbBzB\\d@~B`DHJX`@@@JN^d@hA|AlA~AHNx@dAPV?@jA|ALPRXPTt@dAVZp@`AJLFJTXHL~@lAp@~@t@bALPf@p@Z`@l@z@RXX\\@BX`@HHpBpCxBzClA`BBDb@n@fAvAHLlA`BbC`DX^V\\X^\\d@j@t@FFRXTZLN`AnA@@RX@@@BRV`ArAr@`ADDjA~A\\d@jCnDV\\BD\\d@z@hALRHJBDX\\@?Z`@RVv@dAp@t@\\`@LLNJJNHHXZn@r@fAhAHFr@t@\\\\rAjApBfBh@b@l@d@d@\\LJbAr@NLLHJH\\^b@TxAx@|BxA\\Pz@b@DBVJXJp@V|@T~Bn@dAXfCn@t@RnFvANBRFNDt@R`@HZHbAVLBd@LHBhCp@d@N^J~@VjBd@rAZr@RdAVVHJBnCr@l@NxBh@XHpAZp@Np@Ld@HRBZD~@Jv@Fj@DT@V@f@Bj@@V?h@@xA@zA?fA@N?jA@fA?R?n@@~@?~A@zA?N@b@?X?P?R@J?~@?T?jC@P@P?~C@|@?x@@z@?l@@z@?T?j@@x@?v@?pABnA?v@@vD@L?~@?F?v@@jC@p@?^?j@?r@@~@@T?f@?J?d@@T?N@d@?B?|@?b@@v@?^?X?n@?X?Z@l@?fA@R@V?xADP@`BHH@NB\\BX@NBN@F?TBT@TBVBR@b@D^B|@HF@@?jAHn@F`DVx@F`@DZBT@TBp@Fz@Fj@DP@RB\\@|@Dj@Bj@@J?`@@vA@hA?hA@l@?R?T?R?d@?@?N@`@?|@?X?N?B?T?L@r@?R?V?P?T?Z?P?T@J?F?V?V?V?R?T?^?t@@z@?X@R?~@?T?^?j@@j@?P?j@?R?V?R@T?j@?p@?`A?jD@P@f@?X?z@?l@@f@?`A?n@?X?Z@H?nB?^?~@?nA@P?r@@~B?\\?pBAp@?`BAZAV?`A?rA?~A?~A@h@?D?z@?J?D?H?dA@~@?d@?J?N?F?D?dE@R?j@?^@hB?f@?R?v@?b@?lC@`B@~F@\\?zB@B?vA?f@?F?vC@`A?V?h@?l@@|B?bB@h@?H?dC@pABF?p@@~@Dt@FJ@`BLjBNXBv@FtAH\\Dt@L|@J~@NtAVz@P|@R@@xA^`@LHBNDv@VfCv@NDt@THBTFTFB@b@Jj@NRD~@RHBr@Nl@Ld@Jd@J\\H@?`@JH@b@LVHRFTFRFf@NRJh@PPHnAf@jAh@`EdBf@Th@Tb@RhAf@jClA\\PJD`Bv@HDJDb@Tz@^@@ZLTJNHp@VLFh@Rf@PpAd@f@Ph@Rf@PVJd@Tb@Rf@Xb@Vv@h@f@^`@Zr@j@d@^PNtAfAx@j@x@f@b@TTJPJRH\\LLFJDNDNFj@N^J|@R@?f@Jj@JTDTDTD|@Pj@JrAVtAVTFPDVFJDD@TFTHf@RTHd@RPHTLRJPJPLZRND\\THDx@h@JFl@^VP`@T^T~@h@PJ^Tb@Td@Tf@Tr@\\XLRJVJRHPHVH@@d@Pb@PfA^\\LTH|@XVHJBF@d@Ph@Nf@NTHTFf@PTFD@LDRHRFVJNF`@PFBf@Rf@VRJd@Rd@TRJRJf@TPHtB~@B@RFVJPHh@Rf@R\\LFBRHTHh@Rf@RTH@@PHPFh@Tf@Tb@TTJPHh@XVN`ClABBb@RRLPF^PZPz@^z@^z@^h@Tz@^`@RrAj@|@^d@R~@^d@Rh@Rf@RTJd@PB@|@\\b@PPHVJh@Rf@RPHRHf@TD@LFRHXLzB`A^NfCfAZLt@\\h@Tf@RZJ`@NPFVHh@LTFh@LRBTFRB^FL@j@HRBtCRVBdABd@@n@@f@?bA?jAAjACXAPAVAXAPATAJAH?fDQDATAT?TATAT?TAB?f@?d@Ap@@T?B?P?R?D?N@@?R?T?V@T?R@T?Z?j@@h@?T?D?|@AbACfAEp@CRA"
+              },
+              "start_location": {
+                "lat": 33.0183522,
+                "lng": -96.70946599999999
+              },
+              "travel_mode": "DRIVING"
+            },
+            {
+              "distance": {
+                "text": "0.5 mi",
+                "value": 881
+              },
+              "duration": {
+                "text": "1 min",
+                "value": 35
+              },
+              "end_location": {
+                "lat": 32.7907017,
+                "lng": -96.7925862
+              },
+              "html_instructions": "Continue onto <b>I-345</b>/<wbr/><b>US-75 S</b>",
+              "polyline": {
+                "points": "g~dgEf|wmQl@CH?J?TAVA`@AZAB?P?D?R?D?`@?X?@?j@?`A@f@?N?dA@T?X?TAv@CJAXA|@Kv@Ih@A\\Cz@El@Ct@Ev@EJ?l@El@C\\CPAl@CZA\\Ch@Cj@CZCl@EN?XCV@"
+              },
+              "start_location": {
+                "lat": 32.7985976,
+                "lng": -96.7931577
+              },
+              "travel_mode": "DRIVING"
+            },
+            {
+              "distance": {
+                "text": "0.4 mi",
+                "value": 718
+              },
+              "duration": {
+                "text": "1 min",
+                "value": 30
+              },
+              "end_location": {
+                "lat": 32.7844601,
+                "lng": -96.7913573
+              },
+              "html_instructions": "Continue onto <b>US-75 S</b>",
+              "polyline": {
+                "points": "{lcgEtxwmQb@Cb@CLAj@ETAh@CTAV?j@CT?R?XAN?\\Az@AFAP?^AB?X?p@AZA^AT?TAT?TA`@AlACTAPAXAPCHAJCB?TEHCFEz@Yf@Sj@YVSPMLK^[HM"
+              },
+              "start_location": {
+                "lat": 32.7907017,
+                "lng": -96.7925862
+              },
+              "travel_mode": "DRIVING"
+            },
+            {
+              "distance": {
+                "text": "1.0 mi",
+                "value": 1615
+              },
+              "duration": {
+                "text": "1 min",
+                "value": 80
+              },
+              "end_location": {
+                "lat": 32.775442,
+                "lng": -96.78790000000001
+              },
+              "html_instructions": "Take exit <b>284A</b> for <b>I-30 W</b>",
+              "maneuver": "ramp-right",
+              "polyline": {
+                "points": "{ebgE~pwmQTC@A@?XYHIJKBELOBEd@i@d@k@TYVYPSNSLOHKFGLQLSNULSP]DKJQHUFODMJYJWJa@?A@CFYFUDWDQBSHg@Jq@D[@ABQDUBI@IDSFUBGBMDMDODMDM@GL_@JYHUHSBKFOX{@FSBIBS`@cAJW@EHQHQ@CP]HQJOBCBCBELGNQJKJIHGHIFEBAHIJGNGLIJETGVILALCJAH?JAH?J?H?J@H?J@J@HBPDRFVJLHNJPLHFLH@@HF\\XHFJDL@h@n@j@l@FH\\`@HLLNJL@Bn@`ADDZh@`@n@@BNZJPHP?@BBDL@B@BTf@BH@@Rf@J^Nd@HZDJDR@BH`@Nx@"
+              },
+              "start_location": {
+                "lat": 32.7844601,
+                "lng": -96.7913573
+              },
+              "travel_mode": "DRIVING"
+            },
+            {
+              "distance": {
+                "text": "0.2 mi",
+                "value": 303
+              },
+              "duration": {
+                "text": "1 min",
+                "value": 24
+              },
+              "end_location": {
+                "lat": 32.7744977,
+                "lng": -96.79076219999999
+              },
+              "html_instructions": "Keep <b>right</b> to continue on <b>Exit 45</b>, follow signs for <b>Ervay St</b>",
+              "maneuver": "keep-right",
+              "polyline": {
+                "points": "om`gEj{vmQ?h@?DBJB`@@TBV@P@P@RFl@JtA@N@VFR@BBFNPDDHHRLFD@?FDFFB@DDDDBDBDBFVdA"
+              },
+              "start_location": {
+                "lat": 32.775442,
+                "lng": -96.78790000000001
+              },
+              "travel_mode": "DRIVING"
+            },
+            {
+              "distance": {
+                "text": "0.3 mi",
+                "value": 446
+              },
+              "duration": {
+                "text": "1 min",
+                "value": 50
+              },
+              "end_location": {
+                "lat": 32.7725003,
+                "lng": -96.7947513
+              },
+              "html_instructions": "Continue onto <b>Griffin St W</b>",
+              "polyline": {
+                "points": "sg`gEfmwmQFf@NlADV?H@D@HBLBR@J@F@HBPBP@H@F@D?B@BBL@D@D?@BHLl@RVTb@JPRVNTJNHHTZBB`@h@t@dAh@z@h@z@"
+              },
+              "start_location": {
+                "lat": 32.7744977,
+                "lng": -96.79076219999999
+              },
+              "travel_mode": "DRIVING"
+            },
+            {
+              "distance": {
+                "text": "0.3 mi",
+                "value": 464
+              },
+              "duration": {
+                "text": "1 min",
+                "value": 66
+              },
+              "end_location": {
+                "lat": 32.7756725,
+                "lng": -96.79795209999999
+              },
+              "html_instructions": "Turn <b>right</b> onto <b>S Akard St</b>",
+              "maneuver": "turn-right",
+              "polyline": {
+                "points": "c{_gEdfxmQYZKLKJSREFe@d@ML[ZSRGFYZOLKLODC@MLo@n@m@l@UTWXy@~@k@l@QRQR]^YX[T"
+              },
+              "start_location": {
+                "lat": 32.7725003,
+                "lng": -96.7947513
+              },
+              "travel_mode": "DRIVING"
+            },
+            {
+              "distance": {
+                "text": "381 ft",
+                "value": 116
+              },
+              "duration": {
+                "text": "1 min",
+                "value": 40
+              },
+              "end_location": {
+                "lat": 32.7759428,
+                "lng": -96.7967532
+              },
+              "html_instructions": "Turn <b>right</b>",
+              "maneuver": "turn-right",
+              "polyline": {
+                "points": "}n`gEdzxmQUcBWcBGg@"
+              },
+              "start_location": {
+                "lat": 32.7756725,
+                "lng": -96.79795209999999
+              },
+              "travel_mode": "DRIVING"
+            }
+          ],
+          "traffic_speed_entry": [],
+          "via_waypoint": []
+        }
+      ],
+      "overview_polyline": {
+        "points": "adphEznemQB`D@zFGvWM`@?nEAhC?tEAjI@fA~A[|Du@TO`@M|@Wb@KhCe@hBYhBYxAO@AFSx@C|@CtBG|@CbEM~CIzDEpIWrFOhEIvCBtCN~Eb@nAJjBLbEXxCR~Kz@`[`CtYxBfKv@zC\\nEv@pD|@bBh@`HbCxI~C|]dMjE|A`DlAlAf@vDlBfFrCfKxF`SvKrGrDvA|@`CfB|CjCtAtAbAfAnC|C~CrDbIfJfAjA|AtAhBbBvAjAfBlAjC`BpAr@bEzBfQtJ|D|BxKbGlEdCrC|AtBrAbBhAzAlAjB~AfCfCnAvAbBtBnCvDpMhQjNlRtMnQlMhQpJjMvJrMvHhKvEzFr@r@zC`DpArAdErDjCrBlBtA\\^b@TvErCvBdAjAb@|DdArNtDhBd@nCn@~ErA|L~CpIvBbCj@vAVfD\\`CLfED~FBzLD~HDdNDnFDlIB|LDzFD`H@dDDpBDrBJpAJ|@H`F`@lL|@nDX`CLdCFxGBtE@pHBfg@LnKBbF@`HExM@bF@~d@JfL@xHBhFDrDP~Gh@rBNrBXtCf@xBd@fCr@~EzAjBh@fBb@vGvAfBd@dBf@~CnA~IzDzKdF|BdAdBt@jE|AnCfAjAl@zA`AbDfCPNnCrBrBhApAj@vAb@fCj@lB\\rGlAjAZxAf@bBt@rAx@ND\\TbAn@rBnApC`BdD~AxAn@pAf@~ChA`FzAdDdApAh@hCjAtBbA~CrAjEbBvDzArB`AfEzBhBz@nEpB~JhExGjCnEhBpLdFnCdAhBf@fB\\lBVtCR|AF`EBbEIxAGzG[hEA~BBlEBzFOvAEzCGhF@jC?bAEvAMv@Ih@AxAIfDOtEUnCO|@Ep@A`COtAGpFIdEInFM`AKXEPIbBm@bAm@^Yh@i@VEZYf@k@lDgE^e@|@{AZs@d@oATaAVsAl@sDl@yBtAcEJ]d@wA`@aA\\s@V]\\YVU^Yr@c@`@Md@Kn@Gj@@j@Fd@Ld@Tx@j@h@b@TLL@h@n@r@v@f@n@jAbBdAbBp@vA\\v@x@hCVdANx@?h@BPJ`BVhDBf@HVX^`Ar@PXVdAFf@TdBFf@Hp@RpAFVLl@RV`@t@n@|@dArA~A`Ch@z@YZWXYZcBbB}@~@SF}@|@uC|CmBtBu@n@m@gEGg@"
+      },
+      "summary": "US-75 S",
+      "warnings": [],
+      "waypoint_order": []
+    }
+  ],
+  "status": "OK",
+  "urlRequestUsed": "https://maps.googleapis.com/maps/api/directions/json?destination=Dallas%2C%2TX&origin=Plano%2C%20TX&key=AIzaSyBobgOIZPdz7HN17Hi-uL7T2blKPqyy3No"
+}

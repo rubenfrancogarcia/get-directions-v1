@@ -31,6 +31,7 @@ public class UserData implements Serializable {
     @Column(columnDefinition = "text")
     private Set<Keywords> keywordsDislikes = new HashSet<>();
 
+    //saved routes possibly won't be saved;
     @Lob
     @Column(columnDefinition = "text")
     private List<LinkedList<String>> savedRoutes = new ArrayList<>();

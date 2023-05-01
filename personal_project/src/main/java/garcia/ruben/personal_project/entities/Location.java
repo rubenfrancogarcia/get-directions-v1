@@ -2,12 +2,13 @@ package garcia.ruben.personal_project.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.geo.Point;
+
+import java.util.List;
 
 //used for google maps place id; if id is saved peformance is better;
 //for directions google maps destinations can do a lookup based on input strings
 @Entity
-@Table(name="Location")
+@Table(name = "Location")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -25,5 +26,10 @@ public class Location {
     private Double latitude;
 
     private Double longitude;
+
+    private String address;
+
+    @Column(columnDefinition = "text")
+    private List<String> types;
 
 }
