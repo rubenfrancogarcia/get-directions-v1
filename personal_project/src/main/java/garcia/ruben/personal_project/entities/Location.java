@@ -15,13 +15,13 @@ import java.util.List;
 @Setter
 @Data
 public class Location {
-
+        //todo update entity for fields gained from PlaceApi
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(unique = true)
-    private String googleMapsPlaceId;
+    private String placeId;
 
     private Double latitude;
 
