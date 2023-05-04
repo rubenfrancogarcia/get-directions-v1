@@ -1,7 +1,9 @@
 package garcia.ruben.personal_project.services.location;
 
 import garcia.ruben.personal_project.entities.Location;
+import garcia.ruben.personal_project.pojos.location.DirectionsPojo;
 import garcia.ruben.personal_project.pojos.location.LocationPojo;
+import garcia.ruben.personal_project.pojos.users.UserDataPojo;
 
 public interface GoogleMapsLocationsInterface {
 
@@ -9,5 +11,7 @@ public interface GoogleMapsLocationsInterface {
 
     boolean checkIfLocationSaved(LocationPojo locationPojo);
 
-    public Location updateLocation();
+    void getDirectionsWithRecommendations(DirectionsPojo directionsPojo);
+
+
 }

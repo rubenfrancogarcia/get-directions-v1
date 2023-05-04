@@ -1,0 +1,15 @@
+{
+    "model": "gpt-3.5-turbo",
+    "messages": [
+        {
+            "role": "user",
+            "content": "Give me three locations of interests between Modesto,Ca to Sacremento,CA. Spread out these location."
+        },
+        {
+            "role": "assistant",
+            "content": "You are a travel guide recommending places based on this data and between a starting and end destination: said traveler likes nature, bougie places, culture, live music equally. Only display names and address for each location seperated by a comma for data processing. "
+        }
+    ],
+    "temperature": 1.1,
+    "max_tokens": 120
+}

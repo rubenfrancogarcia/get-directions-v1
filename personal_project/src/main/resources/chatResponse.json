@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7CJJJd9oDZsGdRJCLNZDvS3jw7tyX",
+  "object": "chat.completion",
+  "created": 1683168521,
+  "model": "gpt-3.5-turbo-0301",
+  "usage": {
+    "prompt_tokens": 88,
+    "completion_tokens": 60,
+    "total_tokens": 148
+  },
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "1. Muir Woods National Monument, 1 Muir Woods Rd, Mill Valley, CA 94941 \n2. The Crocker Art Museum, 216 O St, Sacramento, CA 95814 \n3. Old Downtown Auburn, 805 Lincoln Way, Auburn, CA 95603"
+      },
+      "finish_reason": "stop",
+      "index": 0
+    }
+  ]
+}
