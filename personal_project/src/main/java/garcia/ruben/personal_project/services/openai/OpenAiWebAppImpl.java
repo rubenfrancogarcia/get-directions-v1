@@ -10,11 +10,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
+@Service
 public class OpenAiWebAppImpl implements OpenAiInterface {
 
     private static final Logger logger = LogManager.getLogger(OpenAiWebAppImpl.class);

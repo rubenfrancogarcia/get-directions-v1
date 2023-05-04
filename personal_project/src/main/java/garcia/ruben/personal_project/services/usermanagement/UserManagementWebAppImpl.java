@@ -2,7 +2,9 @@ package garcia.ruben.personal_project.services.usermanagement;
 
 import garcia.ruben.personal_project.pojos.users.LoginUserPojo;
 import garcia.ruben.personal_project.pojos.users.RegisterUserPojo;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserManagementWebAppImpl implements UserManagementInterface{
     @Override
     public LoginUserPojo login(LoginUserPojo credentialsPojo) {

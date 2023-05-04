@@ -19,6 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Service
 public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterface {
     private static final Logger logger = LogManager.getLogger(GoogleMapsLocationsWebAppImpl.class);
 
@@ -35,12 +37,10 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
     private final GeoApiContext geoApiContextInstance = geoApiContextInstance();
     @Autowired
     private OpenAiWebAppImpl openAiWebAppImpl;
-    @Autowired
+
     private PlacesApi placesApi;
-    @Autowired
+
     private DirectionsApi directionsApi;
-    @Autowired
-    private DistanceMatrixApi distanceMatrixApi;
 
     @Autowired
     private LocationsRepository locationsRepository;
@@ -117,12 +117,28 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
 
     }
 
-    public void saveGeocodingResultToDB(List<GeocodingResult[]> results) {
+    DirectionsResult getDirections(String origin, String destination, List<FindPlaceFromText> waypoints) {
+        //for 3 waypoints; don't go over 3
+        //assumes list passed in has a length of 3
+        String placeId1 = waypoints.get(0).candidates[0].placeId;
+        String placeId2 = waypoints.get(1).candidates[0].placeId;
+        String placeId3 = waypoints.get(2).candidates[0].placeId;
+        DirectionsApiRequest directions = DirectionsApi.getDirections(geoApiContextInstance, origin, destination);
+        DirectionsResult directionsResult = null;
+        try {
+            directions = DirectionsApi.getDirections(geoApiContextInstance, origin, destination)
+                    .waypointsFromPlaceIds(directions.prefixPlaceId(placeId1), directions.prefixPlaceId(placeId2), directions.prefixPlaceId(placeId3)).departureTimeNow().optimizeWaypoints(true);
+            directionsResult = directions.await();
+        } catch (Exception e) {
+            logger.error("error while getting directions", e);
+        }
+        return directionsResult;
 
     }
 
     @Override
     public void saveLocation(LocationPojo locationPojo) {
+        //todo experimental method used; refactor for only saving a entity, pojo, setup different methods based on type of input
         //reorganize logic
         //at most only starting destination and ending destination will be saved
         DirectionsResult results = null;
@@ -142,11 +158,10 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
             Location location = (Location) locationsRepository.findByPlaceId(placeId);
             if (location == null) {
                 Location newLocation = new Location();
-                newLocation.setGoogleMapsPlaceId(placeId);
+                newLocation.setPlaceId(placeId);
                 newLocations.add(newLocation);
             }
         }
-        //todo might have to improve this logic if adding mulitple endpoints other than starting and ending destination
         LatLng startLocation = directionsRoutes[0].legs[0].startLocation;
         LatLng endLocation = directionsRoutes[0].legs[0].endLocation;
         String startLocationAddress = directionsRoutes[0].legs[0].startAddress;
@@ -189,20 +204,16 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         return null;
     }
 
-    public Object outputRecommendations(ChatRequest chatRequest) {
-
-    }
-
     List<FindPlaceFromText> googleMapsPlaceSearchFind(String[] places) {
         //custom url for desired locations info https://maps.googleapis.com/maps/api/place/findplacefromtext/json?fields=formatted_address%2Cname%2Cgeometry%2Cplace_id%2Ctype&input=Museum%20of%20Contemporary%20Art%20Australia&inputtype=textquery&key=YOUR_API_KEY
         //format for place lookup
-
+        //todo save these locations
         List<FindPlaceFromText> results = new ArrayList<>();
         // PlacesSearchResult candidate = response.candidates[0];
         for (String string : places) {
             FindPlaceFromText result = null;
             try {
-                result = PlacesApi.findPlaceFromText(geoApiContextInstance, "input", FindPlaceFromTextRequest.InputType.TEXT_QUERY)
+                result = PlacesApi.findPlaceFromText(geoApiContextInstance, string, FindPlaceFromTextRequest.InputType.TEXT_QUERY)
                         .fields(
                                 FindPlaceFromTextRequest.FieldMask.PLACE_ID,
                                 FindPlaceFromTextRequest.FieldMask.FORMATTED_ADDRESS,
@@ -225,7 +236,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
 
 
     @Override
-    public void getDirectionsWithRecommendations(DirectionsPojo directionsPojo) {
+    public DirectionsResult getDirectionsWithRecommendations(DirectionsPojo directionsPojo) {
         Location startingLocation;
         if (!(directionsPojo.getStartingLatitude() == null) && !(directionsPojo.getStartingLongitude() == null)) {
             startingLocation = checkIfLocationSaved(directionsPojo.getStartingLatitude(), directionsPojo.getStartingLongitude());
@@ -254,12 +265,14 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         chatRequest.setMessage(messages);
         ChatResponse generatedRecommendations = openAiWebAppImpl.outputRecommendations(chatRequest);
 
-        //these lines process the lines of strings from chatgpt and outputs a list of locations information derived from those strings
+        //these lines process the lines of strings from chatGPT and outputs a list of locations information derived from those strings
         String[] stringAddresses = openAiWebAppImpl.processChatResponseObject(generatedRecommendations);
         List<FindPlaceFromText> chatGptRecommendationsGoogleInfo = googleMapsPlaceSearchFind(stringAddresses);
 
-
         //figure out how to process this and return it in a neat fashion
+        DirectionsResult directions = getDirections(directionsPojo.getStartingPoint(), directionsPojo.getDestination(), chatGptRecommendationsGoogleInfo);
+        //todo save destinations starting and destination if not in database
+        return directions;
     }
 }
 
