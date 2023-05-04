@@ -1,5 +1,6 @@
 package garcia.ruben.personal_project.services.location;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.maps.*;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.*;
@@ -18,6 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
 
     @Value("${google.maps.api.key}")
     private String googleMapsApiKey;
+
     private final GeoApiContext geoApiContextInstance = geoApiContextInstance();
     @Autowired
     private OpenAiWebAppImpl openAiWebAppImpl;
@@ -47,6 +50,8 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
 
     @Autowired
     private UserDataRepository userDataRepository;
+    private WebClient client = WebClient.create();
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     //these setups for using the java client
     public GeoApiContext geoApiContextInstance() {
@@ -66,6 +71,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
 
     //geocode api https://www.javadoc.io/static/com.google.maps/google-maps-services/2.2.0/com/google/maps/GeocodingApiRequest.html
     public GeocodingResult[] getLocation(String address) {
+        //format for reverse geocoding 24%20Sussex%20Drive%20Ottawa%20ON
         GeocodingResult[] geolocationResult = null;
         GeocodingApiRequest result = GeocodingApi.geocode(geoApiContextInstance, address);
         try {
@@ -114,7 +120,6 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
     public void saveGeocodingResultToDB(List<GeocodingResult[]> results) {
 
     }
-
 
     @Override
     public void saveLocation(LocationPojo locationPojo) {
@@ -173,7 +178,6 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         return false;
     }
 
-
     public Location checkIfLocationSaved(double latitude, double longitude) {
         Location dbLocation = (Location) locationsRepository.findByLatitudeAndLongitude(latitude, longitude);
         if (dbLocation != null) {
@@ -185,9 +189,40 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         return null;
     }
 
-    void googleMapsPlaceSearchFind(){
+    public Object outputRecommendations(ChatRequest chatRequest) {
 
     }
+
+    List<FindPlaceFromText> googleMapsPlaceSearchFind(String[] places) {
+        //custom url for desired locations info https://maps.googleapis.com/maps/api/place/findplacefromtext/json?fields=formatted_address%2Cname%2Cgeometry%2Cplace_id%2Ctype&input=Museum%20of%20Contemporary%20Art%20Australia&inputtype=textquery&key=YOUR_API_KEY
+        //format for place lookup
+
+        List<FindPlaceFromText> results = new ArrayList<>();
+        // PlacesSearchResult candidate = response.candidates[0];
+        for (String string : places) {
+            FindPlaceFromText result = null;
+            try {
+                result = PlacesApi.findPlaceFromText(geoApiContextInstance, "input", FindPlaceFromTextRequest.InputType.TEXT_QUERY)
+                        .fields(
+                                FindPlaceFromTextRequest.FieldMask.PLACE_ID,
+                                FindPlaceFromTextRequest.FieldMask.FORMATTED_ADDRESS,
+                                FindPlaceFromTextRequest.FieldMask.NAME,
+                                FindPlaceFromTextRequest.FieldMask.TYPES,
+                                FindPlaceFromTextRequest.FieldMask.GEOMETRY
+                        ).locationBias(new FindPlaceFromTextRequest.LocationBiasIP())
+                        //location Bias can be used to restrict candidates
+                        .await();
+            } catch (ApiException | InterruptedException | IOException e) {
+                logger.error(e);
+                throw new RuntimeException(e);
+            } catch (Exception e) {
+                logger.error(e);
+            }
+            results.add(result);
+        }
+        return results;
+    }
+
 
     @Override
     public void getDirectionsWithRecommendations(DirectionsPojo directionsPojo) {
@@ -218,11 +253,12 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         messages[0] = assistantMessage;
         chatRequest.setMessage(messages);
         ChatResponse generatedRecommendations = openAiWebAppImpl.outputRecommendations(chatRequest);
+
+        //these lines process the lines of strings from chatgpt and outputs a list of locations information derived from those strings
         String[] stringAddresses = openAiWebAppImpl.processChatResponseObject(generatedRecommendations);
-        //format for reverse geocoding 24%20Sussex%20Drive%20Ottawa%20ON
-        //"1. Point Lobos State Natural Reserve - 62 California 1, Carmel-By-The-Sea, CA 93923\n2. Fashion Valley Mall - 7007 Friars Road, San Diego, CA 92108\n3. San Diego Symphony - 750 B Street, Suite 2210, San Diego, CA 92101"
-        List<GeocodingResult[]> resultFromGoogle = gatherLocationsFromOpenAI(stringAddresses);
-        saveGeocodingResultToDB(resultFromGoogle);
+        List<FindPlaceFromText> chatGptRecommendationsGoogleInfo = googleMapsPlaceSearchFind(stringAddresses);
+
+
         //figure out how to process this and return it in a neat fashion
     }
 }
