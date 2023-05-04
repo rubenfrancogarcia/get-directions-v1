@@ -1,5 +1,6 @@
 package garcia.ruben.personal_project.controller;
 
+import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.GeocodingResult;
 import garcia.ruben.personal_project.pojos.location.DirectionsPojo;
 import garcia.ruben.personal_project.pojos.location.LocationPojo;
@@ -26,9 +27,8 @@ public class LocationController {
 
     @PostMapping("/GetDirections")
     public ResponseEntity<?> getDirections(@RequestBody DirectionsPojo directionsPojo) {
-        //todo get from google maps api directions
-        googleMapsLocationsWebApp.getDirectionsWithRecommendations(directionsPojo);
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        DirectionsResult directionsResult = googleMapsLocationsWebApp.getDirectionsWithRecommendations(directionsPojo);
+        return new ResponseEntity<>(directionsResult, HttpStatus.OK);
     }
 
     @PostMapping("/TestGeoCoding")
