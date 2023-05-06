@@ -23,7 +23,7 @@ public class User {
 
     private String lastName;
 
-    @Column( unique = true)
+    @Column(unique = true)
     private String email;
 
     @Column(unique = true)
@@ -35,4 +35,6 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserData userData;
+
+    private String password;
 }
