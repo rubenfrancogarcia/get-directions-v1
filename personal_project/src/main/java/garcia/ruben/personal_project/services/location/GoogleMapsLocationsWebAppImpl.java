@@ -5,6 +5,7 @@ import com.google.maps.*;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.*;
 import garcia.ruben.personal_project.entities.Location;
+import garcia.ruben.personal_project.entities.ViewPort;
 import garcia.ruben.personal_project.pojos.location.DirectionsPojo;
 import garcia.ruben.personal_project.pojos.location.LocationPojo;
 import garcia.ruben.personal_project.pojos.openai.ChatRequest;
@@ -208,24 +209,35 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         //format for place lookup
         //todo save these locations
         // PlacesSearchResult candidate = response.candidates[0];
-            FindPlaceFromText result = null;
-            try {
-                result = PlacesApi.findPlaceFromText(geoApiContextInstance, place, FindPlaceFromTextRequest.InputType.TEXT_QUERY)
-                        .fields(
-                                FindPlaceFromTextRequest.FieldMask.PLACE_ID,
-                                FindPlaceFromTextRequest.FieldMask.FORMATTED_ADDRESS,
-                                FindPlaceFromTextRequest.FieldMask.NAME,
-                                FindPlaceFromTextRequest.FieldMask.TYPES,
-                                FindPlaceFromTextRequest.FieldMask.GEOMETRY
-                        ).locationBias(new FindPlaceFromTextRequest.LocationBiasIP())
-                        //location Bias can be used to restrict candidates
-                        .await();
-            } catch (ApiException | InterruptedException | IOException e) {
-                logger.error(e);
-                throw new RuntimeException(e);
-            } catch (Exception e) {
-                logger.error(e);
+        FindPlaceFromText result = null;
+        try {
+            result = PlacesApi.findPlaceFromText(geoApiContextInstance, place, FindPlaceFromTextRequest.InputType.TEXT_QUERY)
+                    .fields(
+                            FindPlaceFromTextRequest.FieldMask.PLACE_ID,
+                            FindPlaceFromTextRequest.FieldMask.FORMATTED_ADDRESS,
+                            FindPlaceFromTextRequest.FieldMask.NAME,
+                            FindPlaceFromTextRequest.FieldMask.TYPES,
+                            FindPlaceFromTextRequest.FieldMask.GEOMETRY
+                    ).locationBias(new FindPlaceFromTextRequest.LocationBiasIP())
+                    //location Bias can be used to restrict candidates
+                    .await();
+            if (result.candidates.length > 0) {
+                Location newLocation = new Location();
+                newLocation.setPlaceId(result.candidates[0].placeId);
+                newLocation.setFormattedAddress(result.candidates[0].formattedAddress);
+                newLocation.setViewPort((ViewPort) result.candidates[0].geometry.viewport);
+                newLocation.setLongitude(result.candidates[0].geometry.location.lng);
+                newLocation.setLatitude(result.candidates[0].geometry.location.lat);
+                newLocation.setTypes(List.of(result.candidates[0].types));
+                newLocation.setName(result.candidates[0].name);
+                locationsRepository.save(newLocation);
             }
+        } catch (ApiException | InterruptedException | IOException e) {
+            logger.error(e);
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            logger.error(e);
+        }
 
 
         return result;
@@ -250,6 +262,18 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
                         ).locationBias(new FindPlaceFromTextRequest.LocationBiasIP())
                         //location Bias can be used to restrict candidates
                         .await();
+                if (result.candidates.length > 0) {
+                    Location newLocation = new Location();
+                    newLocation.setPlaceId(result.candidates[0].placeId);
+                    newLocation.setFormattedAddress(result.candidates[0].formattedAddress);
+                    newLocation.setViewPort((ViewPort) result.candidates[0].geometry.viewport);
+                    newLocation.setLongitude(result.candidates[0].geometry.location.lng);
+                    newLocation.setLatitude(result.candidates[0].geometry.location.lat);
+                    newLocation.setTypes(List.of(result.candidates[0].types));
+                    newLocation.setName(result.candidates[0].name);
+                    locationsRepository.save(newLocation);
+                }
+
             } catch (ApiException | InterruptedException | IOException e) {
                 logger.error(e);
                 throw new RuntimeException(e);
@@ -265,6 +289,8 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
 
     @Override
     public DirectionsResult getDirectionsWithRecommendations(DirectionsPojo directionsPojo) {
+        //can optimize by using placeId to input the directions;
+        //and use geocodoing api to find info
         Location startingLocation;
         if (!(directionsPojo.getStartingLatitude() == null) && !(directionsPojo.getStartingLongitude() == null)) {
             startingLocation = checkIfLocationSaved(directionsPojo.getStartingLatitude(), directionsPojo.getStartingLongitude());

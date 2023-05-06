@@ -1,5 +1,6 @@
 package garcia.ruben.personal_project.entities;
 
+import com.google.maps.model.Bounds;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,7 +16,6 @@ import java.util.List;
 @Setter
 @Data
 public class Location {
-        //todo update entity for fields gained from PlaceApi
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -23,12 +23,21 @@ public class Location {
     @Column(unique = true)
     private String placeId;
 
+    private String formattedAddress;
+
+    private String name;
+
+    @Embedded
+    private ViewPort viewPort;
+
+    @Embedded
+    private Bounds bounds;
+
     private Double latitude;
 
     private Double longitude;
 
     private String address;
-
     @Column(columnDefinition = "text")
     private List<String> types;
 
