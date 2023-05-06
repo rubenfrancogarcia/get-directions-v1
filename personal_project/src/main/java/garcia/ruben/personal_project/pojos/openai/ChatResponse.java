@@ -1,5 +1,6 @@
 package garcia.ruben.personal_project.pojos.openai;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatResponse {
     private String id;
 
@@ -18,7 +20,7 @@ public class ChatResponse {
 
     private String model;
 
-    private Usage usuage;
+    private Usage usage;
 
     private Choices[] choices;
 }

@@ -1,0 +1,94 @@
+[
+  {
+    "addressComponents": [
+      {
+        "longName": "601",
+        "shortName": "601",
+        "types": [
+          "STREET_NUMBER"
+        ]
+      },
+      {
+        "longName": "Patton Boulevard",
+        "shortName": "Patton Blvd",
+        "types": [
+          "ROUTE"
+        ]
+      },
+      {
+        "longName": "Plano",
+        "shortName": "Plano",
+        "types": [
+          "LOCALITY",
+          "POLITICAL"
+        ]
+      },
+      {
+        "longName": "Collin County",
+        "shortName": "Collin County",
+        "types": [
+          "ADMINISTRATIVE_AREA_LEVEL_2",
+          "POLITICAL"
+        ]
+      },
+      {
+        "longName": "Texas",
+        "shortName": "TX",
+        "types": [
+          "ADMINISTRATIVE_AREA_LEVEL_1",
+          "POLITICAL"
+        ]
+      },
+      {
+        "longName": "United States",
+        "shortName": "US",
+        "types": [
+          "COUNTRY",
+          "POLITICAL"
+        ]
+      },
+      {
+        "longName": "75075",
+        "shortName": "75075",
+        "types": [
+          "POSTAL_CODE"
+        ]
+      }
+    ],
+    "formattedAddress": "601 Patton Blvd, Plano, TX 75075, USA",
+    "postcodeLocalities": null,
+    "geometry": {
+      "bounds": {
+        "northeast": {
+          "lat": 33.0071106,
+          "lng": -96.72633340000002
+        },
+        "southwest": {
+          "lat": 33.00596,
+          "lng": -96.7273384
+        }
+      },
+      "location": {
+        "lat": 33.0066251,
+        "lng": -96.7268213
+      },
+      "locationType": "ROOFTOP",
+      "viewport": {
+        "northeast": {
+          "lat": 33.0078842802915,
+          "lng": -96.7254146697085
+        },
+        "southwest": {
+          "lat": 33.00518631970851,
+          "lng": -96.7281126302915
+        }
+      }
+    },
+    "types": [
+      "PREMISE"
+    ],
+    "partialMatch": false,
+    "placeId": "ChIJtWafk8AYTIYRA-yUMpQf5uU",
+    "plusCode": null
+  }
+]

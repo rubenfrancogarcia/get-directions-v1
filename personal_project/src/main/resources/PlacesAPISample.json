@@ -1,0 +1,39 @@
+{
+  "candidates": [
+    {
+      "formattedAddress": "601 Patton Blvd, Plano, TX 75075, USA",
+      "geometry": {
+        "bounds": null,
+        "location": {
+          "lat": 33.0066251,
+          "lng": -96.7268213
+        },
+        "locationType": null,
+        "viewport": {
+          "northeast": {
+            "lat": 33.00797587989273,
+            "lng": -96.72515527010728
+          },
+          "southwest": {
+            "lat": 33.00527622010728,
+            "lng": -96.72785492989271
+          }
+        }
+      },
+      "name": "601 Patton Blvd",
+      "icon": null,
+      "placeId": "ChIJtWafk8AYTIYRA-yUMpQf5uU",
+      "scope": null,
+      "rating": 0,
+      "types": [
+        "premise"
+      ],
+      "openingHours": null,
+      "photos": null,
+      "vicinity": null,
+      "permanentlyClosed": false,
+      "userRatingsTotal": 0,
+      "businessStatus": null
+    }
+  ]
+}

@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,8 +32,6 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
 
     @Value("${google.maps.api.key}")
     private String googleMapsApiKey;
-
-    private final GeoApiContext geoApiContextInstance = geoApiContextInstance();
     @Autowired
     private OpenAiWebAppImpl openAiWebAppImpl;
 
@@ -50,15 +47,17 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
 
     @Autowired
     private UserDataRepository userDataRepository;
-    private WebClient client = WebClient.create();
+    //private WebClient client = WebClient.create();
     private ObjectMapper objectMapper = new ObjectMapper();
 
     //these setups for using the java client
-    public GeoApiContext geoApiContextInstance() {
+    /*public GeoApiContext geoApiContextInstance() {
         GeoApiContext.Builder builder = new GeoApiContext.Builder();
         builder = builder.apiKey(googleMapsApiKey);
         return builder.build();
-    }
+    }*/
+    @Autowired
+    private GeoApiContext geoApiContextInstance = new GeoApiContext.Builder().apiKey(googleMapsApiKey).build();
 
     public List<GeocodingResult[]> gatherLocationsFromOpenAI(String[] recommendations) {
         List<GeocodingResult[]> results = new ArrayList<>();
@@ -127,7 +126,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         DirectionsResult directionsResult = null;
         try {
             directions = DirectionsApi.getDirections(geoApiContextInstance, origin, destination)
-                    .waypointsFromPlaceIds(directions.prefixPlaceId(placeId1), directions.prefixPlaceId(placeId2), directions.prefixPlaceId(placeId3)).departureTimeNow().optimizeWaypoints(true);
+                    .waypointsFromPlaceIds(placeId1, placeId2, placeId3).departureTimeNow().optimizeWaypoints(true);
             directionsResult = directions.await();
         } catch (Exception e) {
             logger.error("error while getting directions", e);
@@ -194,14 +193,42 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
     }
 
     public Location checkIfLocationSaved(double latitude, double longitude) {
-        Location dbLocation = (Location) locationsRepository.findByLatitudeAndLongitude(latitude, longitude);
-        if (dbLocation != null) {
+        List<Location> dbLocation = locationsRepository.findByLatitudeAndLongitude(latitude, longitude);
+        if (dbLocation.size() > 0) {
             logger.info("location exists in db already");
-            return dbLocation;
+            return dbLocation.get(0);
         } else {
             logger.info("location needs to be queried");
         }
         return null;
+    }
+
+    public FindPlaceFromText googleMapsPlaceSearchFind(String place) {
+        //custom url for desired locations info https://maps.googleapis.com/maps/api/place/findplacefromtext/json?fields=formatted_address%2Cname%2Cgeometry%2Cplace_id%2Ctype&input=Museum%20of%20Contemporary%20Art%20Australia&inputtype=textquery&key=YOUR_API_KEY
+        //format for place lookup
+        //todo save these locations
+        // PlacesSearchResult candidate = response.candidates[0];
+            FindPlaceFromText result = null;
+            try {
+                result = PlacesApi.findPlaceFromText(geoApiContextInstance, place, FindPlaceFromTextRequest.InputType.TEXT_QUERY)
+                        .fields(
+                                FindPlaceFromTextRequest.FieldMask.PLACE_ID,
+                                FindPlaceFromTextRequest.FieldMask.FORMATTED_ADDRESS,
+                                FindPlaceFromTextRequest.FieldMask.NAME,
+                                FindPlaceFromTextRequest.FieldMask.TYPES,
+                                FindPlaceFromTextRequest.FieldMask.GEOMETRY
+                        ).locationBias(new FindPlaceFromTextRequest.LocationBiasIP())
+                        //location Bias can be used to restrict candidates
+                        .await();
+            } catch (ApiException | InterruptedException | IOException e) {
+                logger.error(e);
+                throw new RuntimeException(e);
+            } catch (Exception e) {
+                logger.error(e);
+            }
+
+
+        return result;
     }
 
     List<FindPlaceFromText> googleMapsPlaceSearchFind(String[] places) {
@@ -231,6 +258,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
             }
             results.add(result);
         }
+
         return results;
     }
 
@@ -250,6 +278,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         UserDataPojo userDataPojo = directionsPojo.getUserDataPojo();
         if (userDataPojo == null) {
             //query from database userid
+            logger.warn("user data from request is null");
         }
 
         int amount = 3;
@@ -262,7 +291,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         userMessage.setContent(userContent);
         messages[1] = userMessage;
         messages[0] = assistantMessage;
-        chatRequest.setMessage(messages);
+        chatRequest.setMessages(messages);
         ChatResponse generatedRecommendations = openAiWebAppImpl.outputRecommendations(chatRequest);
 
         //these lines process the lines of strings from chatGPT and outputs a list of locations information derived from those strings

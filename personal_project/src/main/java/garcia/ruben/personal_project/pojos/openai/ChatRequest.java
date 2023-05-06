@@ -14,7 +14,7 @@ import lombok.Setter;
 public class ChatRequest {
     private String model;
 
-    private Message[] message;
+    private Message[] messages;
 
     private double temperature;
 

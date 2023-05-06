@@ -16,6 +16,5 @@ public class DirectionsPojo {
     private Double startingLongitude;
     private String destination;
     private String startingPoint;
-
     private UserDataPojo userDataPojo;
 }

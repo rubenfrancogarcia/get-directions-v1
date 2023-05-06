@@ -1,6 +1,7 @@
 package garcia.ruben.personal_project.controller;
 
 import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.FindPlaceFromText;
 import com.google.maps.model.GeocodingResult;
 import garcia.ruben.personal_project.pojos.location.DirectionsPojo;
 import garcia.ruben.personal_project.pojos.location.LocationPojo;
@@ -12,8 +13,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequestMapping(value = "/V1/Locations")
 public class LocationController {
     @Autowired
@@ -21,6 +23,7 @@ public class LocationController {
 
     @PostMapping("/GetLocation")
     public ResponseEntity<?> saveLocation(@RequestBody LocationPojo locationPojo) {
+
         //todo will check our database if we already have this info otherwise will call to google maps api place
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
@@ -32,11 +35,17 @@ public class LocationController {
     }
 
     @PostMapping("/TestGeoCoding")
-    public ResponseEntity<?> testGeoCoding(@RequestBody DirectionsPojo directionsPojo){
+    public ResponseEntity<?> testGeoCoding() {
         GeocodingResult[] result = googleMapsLocationsWebApp.getLocation("601 patton blvd Plano, Texas");
-        return new ResponseEntity<>(result,HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
         //test via postman first
     }
 
+    @PostMapping("/TestPlaceAPIfromText")
+    public ResponseEntity<?> testPlaceAPIfromText() {
+        FindPlaceFromText result = googleMapsLocationsWebApp.googleMapsPlaceSearchFind("1729 coventry garden way Modesto Ca");
+        return new ResponseEntity<>(result, HttpStatus.OK);
+        //test via postman first
+    }
 
 }

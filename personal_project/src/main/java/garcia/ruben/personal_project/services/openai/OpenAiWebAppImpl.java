@@ -9,12 +9,17 @@ import garcia.ruben.personal_project.pojos.openai.Message;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ClientHttpConnector;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestTemplate;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.Collections;
 
 @Service
 public class OpenAiWebAppImpl implements OpenAiInterface {
@@ -23,20 +28,33 @@ public class OpenAiWebAppImpl implements OpenAiInterface {
 
     @Value("${openai.api.key}")
     private String openAiKey;
-
-    private WebClient client = WebClient.create();
-
+    //private WebClient.Builder client = WebClient.builder();
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    private RestTemplate restTemplate;
+
+    private ClientHttpConnector connector() {
+        return new
+                ReactorClientHttpConnector(HttpClient.create(ConnectionProvider.newConnection()));
+    }
 
     @Override
     public ChatResponse outputRecommendations(ChatRequest chatRequest) {
-        String response;
+        String response = null;
         ChatResponse chatResponseObject;
         try {
-            response = client.post().uri(new URI("https://api.openai.com/v1/chat/completions"))
-                    .header("Authorization", openAiKey).accept(MediaType.APPLICATION_JSON)
-                    .bodyValue(chatRequest).retrieve().bodyToMono(String.class).block();
-        } catch (URISyntaxException e) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(openAiKey);
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity httpEntity = new HttpEntity(chatRequest, headers);
+            restTemplate = new RestTemplate();
+            response = restTemplate.postForEntity("https://api.openai.com/v1/chat/completions", httpEntity, String.class).getBody();
+           /* response = client.build().post().uri(new URI("https://api.openai.com/v1/chat/completions"))
+                    .headers(h -> h.setBearerAuth(openAiKey)).accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(BodyInserters.fromValue(chatRequest)).retrieve().bodyToMono(String.class).block();*/
+        } catch (Exception e) {
             logger.error(e);
             throw new RuntimeException(e);
         }
