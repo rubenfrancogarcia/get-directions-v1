@@ -1,15 +1,16 @@
 package garcia.ruben.personal_project.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Table(name = "users")
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
+@Getter
+@Setter
 public class User {
 
     @Id

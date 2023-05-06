@@ -3,14 +3,15 @@ package garcia.ruben.personal_project.entities;
 import com.google.maps.model.Bounds;
 import com.google.maps.model.LatLng;
 import jakarta.persistence.Embeddable;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Embeddable
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@ToString
+@Getter
+@Setter
 public class ViewPort extends Bounds {
     private LatLng northEast;
 

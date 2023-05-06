@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.maps.*;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.*;
+import garcia.ruben.personal_project.entities.Bounds;
 import garcia.ruben.personal_project.entities.Location;
 import garcia.ruben.personal_project.entities.ViewPort;
 import garcia.ruben.personal_project.pojos.location.DirectionsPojo;
@@ -289,12 +290,39 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
 
     @Override
     public DirectionsResult getDirectionsWithRecommendations(DirectionsPojo directionsPojo) {
-        //can optimize by using placeId to input the directions;
-        //and use geocodoing api to find info
+        GeocodingResult[] startingDestinationInfo = getLocation(directionsPojo.getStartingPoint());
         Location startingLocation;
+        //todo check if starting and ending location is there if it's saved in locations table then use the placeId
         if (!(directionsPojo.getStartingLatitude() == null) && !(directionsPojo.getStartingLongitude() == null)) {
             startingLocation = checkIfLocationSaved(directionsPojo.getStartingLatitude(), directionsPojo.getStartingLongitude());
         }
+        Location newLocation = null;
+        if (startingDestinationInfo.length > 0) {
+            newLocation = new Location();
+            newLocation.setPlaceId(startingDestinationInfo[0].placeId);
+            newLocation.setFormattedAddress(startingDestinationInfo[0].formattedAddress);
+            newLocation.setLongitude(startingDestinationInfo[0].geometry.location.lng);
+            newLocation.setLatitude(startingDestinationInfo[0].geometry.location.lat);
+            newLocation.setViewPort((ViewPort) startingDestinationInfo[0].geometry.viewport);
+            newLocation.setBounds((Bounds) startingDestinationInfo[0].geometry.bounds);
+            newLocation.setName(startingDestinationInfo[0].formattedAddress);
+            locationsRepository.save(newLocation);
+        }
+        GeocodingResult[] endDestinationInfo = getLocation(directionsPojo.getDestination());
+        Location newEndLocation = null;
+        if (endDestinationInfo.length > 0) {
+            newEndLocation = new Location();
+            newEndLocation.setPlaceId(endDestinationInfo[0].placeId);
+            newEndLocation.setFormattedAddress(endDestinationInfo[0].formattedAddress);
+            newEndLocation.setLongitude(endDestinationInfo[0].geometry.location.lng);
+            newEndLocation.setLatitude(endDestinationInfo[0].geometry.location.lat);
+            newEndLocation.setViewPort((ViewPort) endDestinationInfo[0].geometry.viewport);
+            newEndLocation.setBounds((Bounds) endDestinationInfo[0].geometry.bounds);
+            newEndLocation.setName(endDestinationInfo[0].formattedAddress);
+            locationsRepository.save(newEndLocation);
+        }
+        //can optimize by using placeId to input the directions;
+        //and use geocodoing api to find info
         ChatRequest chatRequest = new ChatRequest();
         chatRequest.setModel("gpt-3.5-turbo");
         chatRequest.setTemperature(1.1);
@@ -325,9 +353,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         List<FindPlaceFromText> chatGptRecommendationsGoogleInfo = googleMapsPlaceSearchFind(stringAddresses);
 
         //figure out how to process this and return it in a neat fashion
-        DirectionsResult directions = getDirections(directionsPojo.getStartingPoint(), directionsPojo.getDestination(), chatGptRecommendationsGoogleInfo);
-        //todo save destinations starting and destination if not in database
-        return directions;
+        return getDirections(newLocation != null ? newLocation.getPlaceId() : directionsPojo.getStartingPoint(), newEndLocation != null ? newEndLocation.getPlaceId() : directionsPojo.getDestination(), chatGptRecommendationsGoogleInfo);
     }
 }
 

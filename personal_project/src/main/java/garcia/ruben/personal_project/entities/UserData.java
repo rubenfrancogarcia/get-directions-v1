@@ -14,6 +14,7 @@ import java.util.*;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class UserData implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

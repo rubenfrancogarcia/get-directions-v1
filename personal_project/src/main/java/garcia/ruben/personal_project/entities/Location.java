@@ -1,6 +1,6 @@
 package garcia.ruben.personal_project.entities;
 
-import com.google.maps.model.Bounds;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,6 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @Data
+@ToString
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
