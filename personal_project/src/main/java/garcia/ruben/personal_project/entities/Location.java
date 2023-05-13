@@ -1,6 +1,7 @@
 package garcia.ruben.personal_project.entities;
 
 
+import com.google.maps.model.Geometry;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,15 +29,19 @@ public class Location {
 
     private String name;
 
-    @Embedded
+
+    @Column(name = "view_port", columnDefinition = "text")
     private ViewPort viewPort;
 
-    @Embedded
+
+    @Column(name = "bounds", columnDefinition = "text")
     private Bounds bounds;
 
     private Double latitude;
 
     private Double longitude;
+
+    private Geometry geometry;
 
     private String address;
     @Column(columnDefinition = "text")

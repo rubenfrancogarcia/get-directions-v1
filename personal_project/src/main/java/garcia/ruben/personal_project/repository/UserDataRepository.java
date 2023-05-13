@@ -5,5 +5,5 @@ import garcia.ruben.personal_project.entities.UserData;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserDataRepository extends JpaRepository<UserData, Integer> {
-    UserData FindByUser(User user);
+    UserData findByUser(User user);
 }

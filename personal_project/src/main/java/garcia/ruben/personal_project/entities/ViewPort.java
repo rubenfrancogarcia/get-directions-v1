@@ -12,8 +12,8 @@ import lombok.*;
 @ToString
 @Getter
 @Setter
-public class ViewPort extends Bounds {
-    private LatLng northEast;
+public class ViewPort {
+    private LatLng northEastViewPort;
 
-    private LatLng southWest;
+    private LatLng southWestViewPort;
 }

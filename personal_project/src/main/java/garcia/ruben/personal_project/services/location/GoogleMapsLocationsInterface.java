@@ -8,7 +8,7 @@ public interface GoogleMapsLocationsInterface {
 
     void saveLocation(LocationPojo locationPojo);
 
-    boolean checkIfLocationSaved(LocationPojo locationPojo);
+    Boolean checkIfLocationSaved(LocationPojo locationPojo);
 
     DirectionsResult getDirectionsWithRecommendations(DirectionsPojo directionsPojo);
 

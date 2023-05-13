@@ -11,8 +11,8 @@ import lombok.*;
 @Setter
 @Data
 @ToString
-public class Bounds extends com.google.maps.model.Bounds {
-    private LatLng northEast;
+public class Bounds {
+    private LatLng northEastBounds;
 
-    private LatLng southWest;
+    private LatLng southWestBounds;
 }

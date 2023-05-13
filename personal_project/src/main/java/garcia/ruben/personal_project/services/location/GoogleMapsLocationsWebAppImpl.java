@@ -124,6 +124,8 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         String placeId1 = waypoints.get(0).candidates[0].placeId;
         String placeId2 = waypoints.get(1).candidates[0].placeId;
         String placeId3 = waypoints.get(2).candidates[0].placeId;
+        origin = "place_id:" + origin;
+        destination = "place_id:" + destination;
         DirectionsApiRequest directions = DirectionsApi.getDirections(geoApiContextInstance, origin, destination);
         DirectionsResult directionsResult = null;
         try {
@@ -183,7 +185,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
     }
 
     @Override
-    public boolean checkIfLocationSaved(LocationPojo locationPojo) {
+    public Boolean checkIfLocationSaved(LocationPojo locationPojo) {
         Location dbLocation = (Location) locationsRepository.findByLatitudeAndLongitude(locationPojo.getLatitude(), locationPojo.getLongitude());
         if (dbLocation != null) {
             logger.info("location exists in db already");
@@ -194,15 +196,27 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         return false;
     }
 
-    public Location checkIfLocationSaved(double latitude, double longitude) {
-        List<Location> dbLocation = locationsRepository.findByLatitudeAndLongitude(latitude, longitude);
-        if (dbLocation.size() > 0) {
+    public Boolean checkIfLocationSaved(double latitude, double longitude) {
+        Location dbLocation = locationsRepository.findByLatitudeAndLongitude(latitude, longitude);
+
+        if (dbLocation != null) {
             logger.info("location exists in db already");
-            return dbLocation.get(0);
+            return true;
         } else {
             logger.info("location needs to be queried");
         }
-        return null;
+        return false;
+    }
+
+    public Boolean checkIfLocationSaved(String placeId) {
+        Location dbLocation = locationsRepository.findByPlaceId(placeId);
+        if (dbLocation != null) {
+            logger.info("location exists in db already");
+            return true;
+        } else {
+            logger.info("location needs to be queried");
+        }
+        return false;
     }
 
     public FindPlaceFromText googleMapsPlaceSearchFind(String place) {
@@ -226,7 +240,10 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
                 Location newLocation = new Location();
                 newLocation.setPlaceId(result.candidates[0].placeId);
                 newLocation.setFormattedAddress(result.candidates[0].formattedAddress);
-                newLocation.setViewPort((ViewPort) result.candidates[0].geometry.viewport);
+                ViewPort newViewPort = new ViewPort(result.candidates[0].geometry.viewport.northeast, result.candidates[0].geometry.viewport.southwest);
+                newLocation.setViewPort(newViewPort);
+                Bounds newBounds = new Bounds(result.candidates[0].geometry.bounds.northeast, result.candidates[0].geometry.bounds.southwest);
+                newLocation.setBounds(newBounds);
                 newLocation.setLongitude(result.candidates[0].geometry.location.lng);
                 newLocation.setLatitude(result.candidates[0].geometry.location.lat);
                 newLocation.setTypes(List.of(result.candidates[0].types));
@@ -264,10 +281,16 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
                         //location Bias can be used to restrict candidates
                         .await();
                 if (result.candidates.length > 0) {
+                    if (checkIfLocationSaved(result.candidates[0].placeId)) {
+
+                    }
                     Location newLocation = new Location();
                     newLocation.setPlaceId(result.candidates[0].placeId);
                     newLocation.setFormattedAddress(result.candidates[0].formattedAddress);
-                    newLocation.setViewPort((ViewPort) result.candidates[0].geometry.viewport);
+                    ViewPort newViewPort = new ViewPort(result.candidates[0].geometry.viewport.northeast, result.candidates[0].geometry.viewport.southwest);
+                    newLocation.setViewPort(newViewPort);
+                    Bounds newBounds = new Bounds(result.candidates[0].geometry.bounds.northeast, result.candidates[0].geometry.bounds.southwest);
+                    newLocation.setBounds(newBounds);
                     newLocation.setLongitude(result.candidates[0].geometry.location.lng);
                     newLocation.setLatitude(result.candidates[0].geometry.location.lat);
                     newLocation.setTypes(List.of(result.candidates[0].types));
@@ -290,36 +313,49 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
 
     @Override
     public DirectionsResult getDirectionsWithRecommendations(DirectionsPojo directionsPojo) {
-        GeocodingResult[] startingDestinationInfo = getLocation(directionsPojo.getStartingPoint());
+        //GeocodingResult[] startingDestinationInfo = getLocation(directionsPojo.getStartingPoint());
         Location startingLocation;
         //todo check if starting and ending location is there if it's saved in locations table then use the placeId
-        if (!(directionsPojo.getStartingLatitude() == null) && !(directionsPojo.getStartingLongitude() == null)) {
-            startingLocation = checkIfLocationSaved(directionsPojo.getStartingLatitude(), directionsPojo.getStartingLongitude());
-        }
         Location newLocation = null;
-        if (startingDestinationInfo.length > 0) {
-            newLocation = new Location();
-            newLocation.setPlaceId(startingDestinationInfo[0].placeId);
-            newLocation.setFormattedAddress(startingDestinationInfo[0].formattedAddress);
-            newLocation.setLongitude(startingDestinationInfo[0].geometry.location.lng);
-            newLocation.setLatitude(startingDestinationInfo[0].geometry.location.lat);
-            newLocation.setViewPort((ViewPort) startingDestinationInfo[0].geometry.viewport);
-            newLocation.setBounds((Bounds) startingDestinationInfo[0].geometry.bounds);
-            newLocation.setName(startingDestinationInfo[0].formattedAddress);
-            locationsRepository.save(newLocation);
+        if (directionsPojo.getStartingLongitude() != null && directionsPojo.getStartingLatitude() != null) {
+            if (!checkIfLocationSaved(directionsPojo.getStartingLatitude(), directionsPojo.getStartingLongitude())) {
+                newLocation = new Location();
+                GeocodingResult[] startingDestinationInfo = getLocation(directionsPojo.getStartingPoint());
+                newLocation.setPlaceId(startingDestinationInfo[0].placeId);
+                newLocation.setFormattedAddress(startingDestinationInfo[0].formattedAddress);
+                newLocation.setLongitude(startingDestinationInfo[0].geometry.location.lng);
+                newLocation.setLatitude(startingDestinationInfo[0].geometry.location.lat);
+                ViewPort newViewPort = new ViewPort(startingDestinationInfo[0].geometry.viewport.northeast, startingDestinationInfo[0].geometry.viewport.southwest);
+                newLocation.setViewPort(newViewPort);
+                Bounds newBounds = new Bounds(startingDestinationInfo[0].geometry.bounds.northeast, startingDestinationInfo[0].geometry.bounds.southwest);
+                newLocation.setBounds(newBounds);
+                newLocation.setName(startingDestinationInfo[0].formattedAddress);
+                newLocation.setGeometry(startingDestinationInfo[0].geometry);
+                if (!checkIfLocationSaved(newLocation.getPlaceId())) {
+                    locationsRepository.save(newLocation);
+                }
+            }
+
         }
         GeocodingResult[] endDestinationInfo = getLocation(directionsPojo.getDestination());
         Location newEndLocation = null;
         if (endDestinationInfo.length > 0) {
-            newEndLocation = new Location();
-            newEndLocation.setPlaceId(endDestinationInfo[0].placeId);
-            newEndLocation.setFormattedAddress(endDestinationInfo[0].formattedAddress);
-            newEndLocation.setLongitude(endDestinationInfo[0].geometry.location.lng);
-            newEndLocation.setLatitude(endDestinationInfo[0].geometry.location.lat);
-            newEndLocation.setViewPort((ViewPort) endDestinationInfo[0].geometry.viewport);
-            newEndLocation.setBounds((Bounds) endDestinationInfo[0].geometry.bounds);
-            newEndLocation.setName(endDestinationInfo[0].formattedAddress);
-            locationsRepository.save(newEndLocation);
+            if (!checkIfLocationSaved(directionsPojo.getDestination())) {
+                newEndLocation = new Location();
+                newEndLocation.setPlaceId(endDestinationInfo[0].placeId);
+                newEndLocation.setFormattedAddress(endDestinationInfo[0].formattedAddress);
+                newEndLocation.setLongitude(endDestinationInfo[0].geometry.location.lng);
+                newEndLocation.setLatitude(endDestinationInfo[0].geometry.location.lat);
+                ViewPort newViewPort = new ViewPort(endDestinationInfo[0].geometry.viewport.northeast, endDestinationInfo[0].geometry.viewport.southwest);
+                newLocation.setViewPort(newViewPort);
+                Bounds newBounds = new Bounds(endDestinationInfo[0].geometry.bounds.northeast, endDestinationInfo[0].geometry.bounds.southwest);
+                newLocation.setBounds(newBounds);
+                newEndLocation.setName(endDestinationInfo[0].formattedAddress);
+                newEndLocation.setGeometry(endDestinationInfo[0].geometry);
+                if (!checkIfLocationSaved(newEndLocation.getPlaceId())) {
+                    locationsRepository.save(newEndLocation);
+                }
+            }
         }
         //can optimize by using placeId to input the directions;
         //and use geocodoing api to find info

@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface LocationsRepository extends JpaRepository<Location, Integer> {
-    List<Location> findByLatitudeAndLongitude(Double latitude, Double longitude);
+    Location findByLatitudeAndLongitude(Double latitude, Double longitude);
 
-    List<Location> findByPlaceId(String placeId);
+    Location findByPlaceId(String placeId);
 }

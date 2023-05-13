@@ -22,6 +22,7 @@ public class UserManagementWebAppImpl implements UserManagementInterface {
     @Autowired
     UserDataRepository userDataRepository;
 
+    @Autowired
     Security securityClass;
 
     PasswordEncoder passwordEncoder;
@@ -35,7 +36,7 @@ public class UserManagementWebAppImpl implements UserManagementInterface {
     public LoginUserPojo login(LoginUserPojo credentialsPojo) {
         //TODO just return all the partial user data in a Pojo
         User user = userRepository.findByUsername(credentialsPojo.getUsername());
-        UserData userData = userDataRepository.FindByUser(user);
+        UserData userData = userDataRepository.findByUser(user);
         if (user != null) {
             if (passwordEncoder.matches(credentialsPojo.getPassword(), user.getPassword())) {
                 LoginUserPojo loginUserPojo = new LoginUserPojo();
@@ -75,7 +76,7 @@ public class UserManagementWebAppImpl implements UserManagementInterface {
     public UpdateDataPojo updateUserData(UpdateDataPojo updateDataPojo) {
         try {
             User user = userRepository.findByUsername(updateDataPojo.getUsername());
-            UserData userData = userDataRepository.FindByUser(user);
+            UserData userData = userDataRepository.findByUser(user);
             userData.setKeywordsDislikes(updateDataPojo.getKeywordsDislikes());
             userData.setKeywordsLikes(updateDataPojo.getKeywordsLikes());
             userData.setLocationsVisited(userData.getLocationsVisited());
