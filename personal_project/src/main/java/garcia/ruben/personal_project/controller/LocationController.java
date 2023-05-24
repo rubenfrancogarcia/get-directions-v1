@@ -6,7 +6,7 @@ import com.google.maps.model.PlacesSearchResult;
 import garcia.ruben.personal_project.pojos.location.DirectionsPojo;
 import garcia.ruben.personal_project.pojos.location.GoogleMapsDirectionsServiceRequest;
 import garcia.ruben.personal_project.pojos.location.GoogleRenderDirectionsPOJO;
-import garcia.ruben.personal_project.pojos.location.LocationPojo;
+import garcia.ruben.personal_project.pojos.location.SaveUserLocationPojo;
 import garcia.ruben.personal_project.services.location.GoogleMapsLocationsWebAppImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,13 +23,6 @@ public class LocationController {
 
     @Autowired
     private GoogleMapsLocationsWebAppImpl googleMapsLocationsWebApp;
-
-    @PostMapping("/GetLocation")
-    public ResponseEntity<?> saveLocation(@RequestBody LocationPojo locationPojo) {
-
-        //todo will check our database if we already have this info otherwise will call to google maps api place
-        return new ResponseEntity<>(null, HttpStatus.OK);
-    }
 
     @PostMapping("/GetDirections")
     public ResponseEntity<?> getDirections(@RequestBody DirectionsPojo directionsPojo) {
@@ -60,6 +53,18 @@ public class LocationController {
     public ResponseEntity<?> GenerateDirectionsRequestAndPlacesInfo(@RequestBody DirectionsPojo directionsPojo) {
         GoogleRenderDirectionsPOJO request = googleMapsLocationsWebApp.provideRenderingServiceInformation(directionsPojo);
         return new ResponseEntity<>(request, HttpStatus.OK);
+    }
+
+    @PostMapping("/SaveFavoriteLocation")
+    public ResponseEntity<?> saveFavoriteLocation(@RequestBody SaveUserLocationPojo saveUserLocation) {
+        googleMapsLocationsWebApp.saveUserFavLocation(saveUserLocation);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/DeleteFavoriteLocation")
+    public ResponseEntity<?> deleteFavoriteLocation(@RequestBody SaveUserLocationPojo deleteUserLocation) {
+        googleMapsLocationsWebApp.deleteUserFavLocation(deleteUserLocation);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

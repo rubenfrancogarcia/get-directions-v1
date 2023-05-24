@@ -6,6 +6,8 @@ import com.google.maps.errors.ApiException;
 import com.google.maps.model.*;
 import garcia.ruben.personal_project.entities.Bounds;
 import garcia.ruben.personal_project.entities.Location;
+import garcia.ruben.personal_project.entities.UserData;
+import garcia.ruben.personal_project.entities.User;
 import garcia.ruben.personal_project.entities.ViewPort;
 import garcia.ruben.personal_project.pojos.location.*;
 import garcia.ruben.personal_project.pojos.openai.ChatRequest;
@@ -25,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterface {
@@ -137,18 +140,6 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         return directionsResult;
 
     }
-
-    void prepForGoogleMapsRenderer(DirectionsResult directionsResult) {
-        //not useful
-        LatLng[] latLngBound = new LatLng[2];
-        for (int i = 0; i < directionsResult.routes.length; i++) {
-            com.google.maps.model.Bounds bounds = directionsResult.routes[i].bounds;
-            LatLng sw = new LatLng(bounds.southwest.lat, bounds.southwest.lng);
-            LatLng ne = new LatLng(bounds.northeast.lat, bounds.northeast.lng);
-            //bounds = latLngBound;
-        }
-    }
-
     @Override
     public void saveLocation(LocationPojo locationPojo) {
         //todo experimental method used; refactor for only saving a entity, pojo, setup different methods based on type of input
@@ -566,6 +557,34 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         GoogleRenderDirectionsPOJO googleRenderDirectionsPOJO = new GoogleRenderDirectionsPOJO();
         googleRenderDirectionsPOJO.setGoogleMapsDirectionsServiceRequest(googleMapsDirectionsServiceRequest);
         return googleRenderDirectionsPOJO;
+    }
+
+    public void saveUserFavLocation(SaveUserLocationPojo saveUserLocation) {
+        try{
+            User user = userRepository.findByUsername(saveUserLocation.getUsername());
+            UserData userData = userDataRepository.findByUser(user);
+            Set<String> userInterests = userData.getLocationsOfInterest();
+            userInterests.add(saveUserLocation.getPlaceId());
+            userData.setLocationsOfInterest(userInterests);
+            userDataRepository.save(userData);
+        }
+        catch(Exception e){
+            logger.error(e);
+        }
+    }
+
+    public void deleteUserFavLocation(SaveUserLocationPojo saveUserLocation) {
+        try{
+            User user = userRepository.findByUsername(saveUserLocation.getUsername());
+            UserData userData = userDataRepository.findByUser(user);
+            Set<String> userInterests = userData.getLocationsOfInterest();
+            userInterests.remove(saveUserLocation.getPlaceId());
+            userData.setLocationsOfInterest(userInterests);
+            userDataRepository.save(userData);
+        }
+        catch(Exception e){
+            logger.error(e);
+        }
     }
 }
 
