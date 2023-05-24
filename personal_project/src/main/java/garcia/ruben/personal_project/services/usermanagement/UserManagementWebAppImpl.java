@@ -2,6 +2,7 @@ package garcia.ruben.personal_project.services.usermanagement;
 
 import garcia.ruben.personal_project.entities.User;
 import garcia.ruben.personal_project.entities.UserData;
+import garcia.ruben.personal_project.pojos.users.LogInRequest;
 import garcia.ruben.personal_project.pojos.users.LoginUserPojo;
 import garcia.ruben.personal_project.pojos.users.RegisterUserPojo;
 import garcia.ruben.personal_project.pojos.users.UpdateDataPojo;
@@ -18,14 +19,14 @@ import org.springframework.stereotype.Service;
 public class UserManagementWebAppImpl implements UserManagementInterface {
     private static final Logger logger = LogManager.getLogger(UserManagementWebAppImpl.class);
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    UserDataRepository userDataRepository;
+    private UserDataRepository userDataRepository;
 
     @Autowired
-    Security securityClass;
+    private Security securityClass;
 
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public void getPasswordEncoder() {
@@ -33,20 +34,16 @@ public class UserManagementWebAppImpl implements UserManagementInterface {
     }
 
     @Override
-    public LoginUserPojo login(LoginUserPojo credentialsPojo) {
-        //TODO just return all the partial user data in a Pojo
-        User user = userRepository.findByUsername(credentialsPojo.getUsername());
-        UserData userData = userDataRepository.findByUser(user);
+    public LoginUserPojo login(LogInRequest credentialsPojo) {
+        User user = userRepository.findFirstByUsername(credentialsPojo.getUsername());
         if (user != null) {
             if (passwordEncoder.matches(credentialsPojo.getPassword(), user.getPassword())) {
                 LoginUserPojo loginUserPojo = new LoginUserPojo();
-                loginUserPojo.setFirstName(user.getFirstName());
-                loginUserPojo.setLastName(user.getLastName());
-                loginUserPojo.setUsername(user.getUsername());
-                loginUserPojo.setUserData(userData);
+                loginUserPojo.setUserPojo(user);
+                //setting entities for faster dev
                 return loginUserPojo;
             } else {
-                return null;
+                logger.info("wrong password");
             }
         }
         return null;
@@ -64,6 +61,9 @@ public class UserManagementWebAppImpl implements UserManagementInterface {
         newUser.setPassword(passwordEncoder.encode(registerUserPojo.getPassword()));
         try {
             User user = userRepository.save(newUser);
+            UserData newUserDataInit = new UserData();
+            newUserDataInit.setUser(user);
+            userDataRepository.save(newUserDataInit);
             logger.info("new user saved {}", user);
             return "success";
         } catch (Exception e) {
@@ -75,11 +75,9 @@ public class UserManagementWebAppImpl implements UserManagementInterface {
     @Override
     public UpdateDataPojo updateUserData(UpdateDataPojo updateDataPojo) {
         try {
-            User user = userRepository.findByUsername(updateDataPojo.getUsername());
+            User user = userRepository.findFirstByUsername(updateDataPojo.getUsername());
             UserData userData = userDataRepository.findByUser(user);
-            userData.setKeywordsDislikes(updateDataPojo.getKeywordsDislikes());
             userData.setKeywordsLikes(updateDataPojo.getKeywordsLikes());
-            userData.setLocationsVisited(userData.getLocationsVisited());
             userData.setLocationsOfInterest(updateDataPojo.getLocationsOfInterest());
             userDataRepository.save(userData);
             return updateDataPojo;
@@ -99,24 +97,4 @@ public class UserManagementWebAppImpl implements UserManagementInterface {
 
     }
 
-    @Override
-    public void onboardNewUserService() {
-
-    }
-
-
-    @Override
-    public void saveLocationToFave() {
-
-    }
-
-    @Override
-    public void saveCustomRoute() {
-
-    }
-
-    @Override
-    public void updateUserDataKeywords() {
-
-    }
 }

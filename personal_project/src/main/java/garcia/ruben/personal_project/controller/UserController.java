@@ -1,9 +1,6 @@
 package garcia.ruben.personal_project.controller;
 
-import garcia.ruben.personal_project.pojos.users.LoginUserPojo;
-import garcia.ruben.personal_project.pojos.users.RegisterUserPojo;
-import garcia.ruben.personal_project.pojos.users.UpdateDataPojo;
-import garcia.ruben.personal_project.pojos.users.UserDataPojo;
+import garcia.ruben.personal_project.pojos.users.*;
 import garcia.ruben.personal_project.services.usermanagement.UserManagementWebAppImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,15 +8,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins= "http://localhost:5173/" )
+@CrossOrigin(origins = "http://localhost:5173/")
 @RequestMapping(value = "/V1/User")
 public class UserController {
     @Autowired
     UserManagementWebAppImpl userManagementWebApp;
 
     @PostMapping(value = "/Login")
-    public ResponseEntity<?> userLogin(@RequestBody LoginUserPojo loginUserPojo) {
-        LoginUserPojo userPojo = userManagementWebApp.login(loginUserPojo);
+    public ResponseEntity<?> userLogin(@RequestBody LogInRequest request) {
+        LoginUserPojo userPojo = userManagementWebApp.login(request);
         if (userPojo != null) {
             return new ResponseEntity<>(userPojo, HttpStatus.OK);
         }

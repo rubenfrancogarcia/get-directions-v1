@@ -4,15 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.maps.*;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.*;
-import garcia.ruben.personal_project.entities.Bounds;
 import garcia.ruben.personal_project.entities.Location;
-import garcia.ruben.personal_project.entities.UserData;
 import garcia.ruben.personal_project.entities.User;
-import garcia.ruben.personal_project.entities.ViewPort;
+import garcia.ruben.personal_project.entities.UserData;
 import garcia.ruben.personal_project.pojos.location.*;
 import garcia.ruben.personal_project.pojos.openai.ChatRequest;
+import garcia.ruben.personal_project.pojos.openai.ChatResponse;
 import garcia.ruben.personal_project.pojos.openai.Message;
-import garcia.ruben.personal_project.pojos.users.UserDataPojo;
 import garcia.ruben.personal_project.repository.LocationsRepository;
 import garcia.ruben.personal_project.repository.UserDataRepository;
 import garcia.ruben.personal_project.repository.UserRepository;
@@ -140,6 +138,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         return directionsResult;
 
     }
+
     @Override
     public void saveLocation(LocationPojo locationPojo) {
         //todo experimental method used; refactor for only saving a entity, pojo, setup different methods based on type of input
@@ -159,7 +158,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         logger.info("geocodedWaypoint {}" + Arrays.toString(geocodedWaypoints));
         for (GeocodedWaypoint geocodedWaypoint : geocodedWaypoints) {
             String placeId = geocodedWaypoint.placeId;
-            Location location = (Location) locationsRepository.findByPlaceId(placeId);
+            Location location = (Location) locationsRepository.findFirstByPlaceId(placeId);
             if (location == null) {
                 Location newLocation = new Location();
                 newLocation.setPlaceId(placeId);
@@ -187,7 +186,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
 
     @Override
     public Boolean checkIfLocationSaved(LocationPojo locationPojo) {
-        Location dbLocation = (Location) locationsRepository.findByLatitudeAndLongitude(locationPojo.getLatitude(), locationPojo.getLongitude());
+        Location dbLocation = (Location) locationsRepository.findFirstByLatitudeAndLongitude(locationPojo.getLatitude(), locationPojo.getLongitude());
         if (dbLocation != null) {
             logger.info("location exists in db already");
             return true;
@@ -198,7 +197,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
     }
 
     public Boolean checkIfLocationSaved(double latitude, double longitude) {
-        Location dbLocation = locationsRepository.findByLatitudeAndLongitude(latitude, longitude);
+        Location dbLocation = locationsRepository.findFirstByLatitudeAndLongitude(latitude, longitude);
 
         if (dbLocation != null) {
             logger.info("location exists in db already");
@@ -210,7 +209,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
     }
 
     public Boolean checkIfLocationSaved(String placeId) {
-        Location dbLocation = locationsRepository.findByPlaceId(placeId);
+        Location dbLocation = locationsRepository.findFirstByPlaceId(placeId);
         if (dbLocation != null) {
             logger.info("location exists in db already");
             return true;
@@ -235,19 +234,23 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
                     //location Bias can be used to restrict candidates
                     .await();
             if (result.candidates.length > 0) {
-                //only uses first option, can optimize here for additional candidates
-                Location newLocation = new Location();
-                newLocation.setPlaceId(result.candidates[0].placeId);
-                newLocation.setFormattedAddress(result.candidates[0].formattedAddress);
-                ViewPort newViewPort = new ViewPort(result.candidates[0].geometry.viewport.northeast, result.candidates[0].geometry.viewport.southwest);
-                newLocation.setViewPort(newViewPort);
-                Bounds newBounds = new Bounds(result.candidates[0].geometry.bounds.northeast, result.candidates[0].geometry.bounds.southwest);
-                newLocation.setBounds(newBounds);
-                newLocation.setLongitude(result.candidates[0].geometry.location.lng);
-                newLocation.setLatitude(result.candidates[0].geometry.location.lat);
-                newLocation.setTypes(List.of(result.candidates[0].types));
-                newLocation.setName(result.candidates[0].name);
-                locationsRepository.save(newLocation);
+                String placeId = result.candidates[0].placeId;
+                if (!checkIfLocationSaved(placeId)) {
+                    //only uses first option, can optimize here for additional candidates
+                    Location newLocation = new Location();
+                    newLocation.setPlaceId(result.candidates[0].placeId);
+                    newLocation.setFormattedAddress(result.candidates[0].formattedAddress);
+                    //these were generating null exceptions
+                    //ViewPort newViewPort = new ViewPort(result.candidates[0].geometry.viewport.northeast, result.candidates[0].geometry.viewport.southwest);
+                    //newLocation.setViewPort(newViewPort);
+                    //Bounds newBounds = new Bounds(result.candidates[0].geometry.bounds.northeast, result.candidates[0].geometry.bounds.southwest);
+                    //newLocation.setBounds(newBounds);
+                    newLocation.setLongitude(result.candidates[0].geometry.location.lng);
+                    newLocation.setLatitude(result.candidates[0].geometry.location.lat);
+                    //newLocation.setTypes(List.of(result.candidates[0].types));
+                    newLocation.setName(result.candidates[0].name);
+                    locationsRepository.save(newLocation);
+                }
                 return result.candidates[0];
             }
         } catch (ApiException | InterruptedException | IOException e) {
@@ -286,12 +289,12 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
                 newLocation.setFormattedAddress(startingDestinationInfo[0].formattedAddress);
                 newLocation.setLongitude(startingDestinationInfo[0].geometry.location.lng);
                 newLocation.setLatitude(startingDestinationInfo[0].geometry.location.lat);
-                ViewPort newViewPort = new ViewPort(startingDestinationInfo[0].geometry.viewport.northeast, startingDestinationInfo[0].geometry.viewport.southwest);
-                newLocation.setViewPort(newViewPort);
-                Bounds newBounds = new Bounds(startingDestinationInfo[0].geometry.bounds.northeast, startingDestinationInfo[0].geometry.bounds.southwest);
-                newLocation.setBounds(newBounds);
-                newLocation.setName(startingDestinationInfo[0].formattedAddress);
-                newLocation.setGeometry(startingDestinationInfo[0].geometry);
+                //ViewPort newViewPort = new ViewPort(startingDestinationInfo[0].geometry.viewport.northeast, startingDestinationInfo[0].geometry.viewport.southwest);
+                //newLocation.setViewPort(newViewPort);
+                //Bounds newBounds = new Bounds(startingDestinationInfo[0].geometry.bounds.northeast, startingDestinationInfo[0].geometry.bounds.southwest);
+                //newLocation.setBounds(newBounds);
+                //newLocation.setName(startingDestinationInfo[0].formattedAddress);
+                //newLocation.setGeometry(startingDestinationInfo[0].geometry);
                 if (!checkIfLocationSaved(newLocation.getPlaceId())) {
                     locationsRepository.save(newLocation);
                 }
@@ -307,12 +310,12 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
                 newEndLocation.setFormattedAddress(endDestinationInfo[0].formattedAddress);
                 newEndLocation.setLongitude(endDestinationInfo[0].geometry.location.lng);
                 newEndLocation.setLatitude(endDestinationInfo[0].geometry.location.lat);
-                ViewPort newViewPort = new ViewPort(endDestinationInfo[0].geometry.viewport.northeast, endDestinationInfo[0].geometry.viewport.southwest);
-                newLocation.setViewPort(newViewPort);
-                Bounds newBounds = new Bounds(endDestinationInfo[0].geometry.bounds.northeast, endDestinationInfo[0].geometry.bounds.southwest);
-                newLocation.setBounds(newBounds);
-                newEndLocation.setName(endDestinationInfo[0].formattedAddress);
-                newEndLocation.setGeometry(endDestinationInfo[0].geometry);
+                //ViewPort newViewPort = new ViewPort(endDestinationInfo[0].geometry.viewport.northeast, endDestinationInfo[0].geometry.viewport.southwest);
+                //newLocation.setViewPort(newViewPort);
+                //Bounds newBounds = new Bounds(endDestinationInfo[0].geometry.bounds.northeast, endDestinationInfo[0].geometry.bounds.southwest);
+                //newLocation.setBounds(newBounds);
+                //newEndLocation.setName(endDestinationInfo[0].formattedAddress);
+                //newEndLocation.setGeometry(endDestinationInfo[0].geometry);
                 if (!checkIfLocationSaved(newEndLocation.getPlaceId())) {
                     locationsRepository.save(newEndLocation);
                 }
@@ -326,21 +329,21 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         chatRequest.setMax_tokens(120);
         Message[] messages = new Message[2];
         Message assistantMessage = new Message();
-        UserDataPojo userDataPojo = directionsPojo.getUserDataPojo();
-        if (userDataPojo == null) {
-            //query from database userid
-            logger.warn("user data from request is null");
+        String username = directionsPojo.getUsername();
+        User user = userRepository.findFirstByUsername(username);
+        UserData userData = userDataRepository.findByUser(user);
+        int amount = directionsPojo.getNumberOfWaypoints();
+        if (amount > 9) {
+            throw new RuntimeException();
+            //don't want to run more than 9 due to google maps api billing
         }
-
-        int amount = 3;
-        //todo add customisation to fix this
         String assistantContent = "You are a travel guide recommending" + amount + " interesting locations based on the user's prompt data and between the starting and end destination.Your response should only return the name and address of the location";
         assistantMessage.setRole("assistant");
         assistantMessage.setContent(assistantContent);
         Message userMessage = new Message();
         userMessage.setRole("user");
         //modify to actually use user info
-        String userContent = "user likes:" + (userDataPojo != null ? userDataPojo.keywordsToString() : "all kinds of places") + "; Origin:" + directionsPojo.getStartingPoint() + ". Destination: " + directionsPojo.getDestination() + " Your response should only return the name and address of the location";
+        String userContent = "user likes:" + (userData != null ? userData.getKeywordsLikes() : "all kinds of places") + "; Origin:" + directionsPojo.getStartingPoint() + ". Destination: " + directionsPojo.getDestination() + " Your response should only return the name and address of the location";
         userMessage.setContent(userContent);
         messages[1] = userMessage;
         messages[0] = assistantMessage;
@@ -371,12 +374,12 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
                 newLocation.setFormattedAddress(startingDestinationInfo[0].formattedAddress);
                 newLocation.setLongitude(startingDestinationInfo[0].geometry.location.lng);
                 newLocation.setLatitude(startingDestinationInfo[0].geometry.location.lat);
-                ViewPort newViewPort = new ViewPort(startingDestinationInfo[0].geometry.viewport.northeast, startingDestinationInfo[0].geometry.viewport.southwest);
-                newLocation.setViewPort(newViewPort);
-                Bounds newBounds = new Bounds(startingDestinationInfo[0].geometry.bounds.northeast, startingDestinationInfo[0].geometry.bounds.southwest);
-                newLocation.setBounds(newBounds);
-                newLocation.setName(startingDestinationInfo[0].formattedAddress);
-                newLocation.setGeometry(startingDestinationInfo[0].geometry);
+                //ViewPort newViewPort = new ViewPort(startingDestinationInfo[0].geometry.viewport.northeast, startingDestinationInfo[0].geometry.viewport.southwest);
+                //newLocation.setViewPort(newViewPort);
+                //Bounds newBounds = new Bounds(startingDestinationInfo[0].geometry.bounds.northeast, startingDestinationInfo[0].geometry.bounds.southwest);
+                //newLocation.setBounds(newBounds);
+                //newLocation.setName(startingDestinationInfo[0].formattedAddress);
+                //newLocation.setGeometry(startingDestinationInfo[0].geometry);
                 if (!checkIfLocationSaved(newLocation.getPlaceId())) {
                     locationsRepository.save(newLocation);
                 }
@@ -391,12 +394,12 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
                 newEndLocation.setFormattedAddress(endDestinationInfo[0].formattedAddress);
                 newEndLocation.setLongitude(endDestinationInfo[0].geometry.location.lng);
                 newEndLocation.setLatitude(endDestinationInfo[0].geometry.location.lat);
-                ViewPort newViewPort = new ViewPort(endDestinationInfo[0].geometry.viewport.northeast, endDestinationInfo[0].geometry.viewport.southwest);
-                newLocation.setViewPort(newViewPort);
-                Bounds newBounds = new Bounds(endDestinationInfo[0].geometry.bounds.northeast, endDestinationInfo[0].geometry.bounds.southwest);
-                newLocation.setBounds(newBounds);
-                newEndLocation.setName(endDestinationInfo[0].formattedAddress);
-                newEndLocation.setGeometry(endDestinationInfo[0].geometry);
+                //ViewPort newViewPort = new ViewPort(endDestinationInfo[0].geometry.viewport.northeast, endDestinationInfo[0].geometry.viewport.southwest);
+                //newLocation.setViewPort(newViewPort);
+                //Bounds newBounds = new Bounds(endDestinationInfo[0].geometry.bounds.northeast, endDestinationInfo[0].geometry.bounds.southwest);
+                //newLocation.setBounds(newBounds);
+                //newEndLocation.setName(endDestinationInfo[0].formattedAddress);
+                //newEndLocation.setGeometry(endDestinationInfo[0].geometry);
                 if (!checkIfLocationSaved(newEndLocation.getPlaceId())) {
                     locationsRepository.save(newEndLocation);
                 }
@@ -410,19 +413,16 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         chatRequest.setMax_tokens(120);
         Message[] messages = new Message[2];
         Message assistantMessage = new Message();
-        UserDataPojo userDataPojo = directionsPojo.getUserDataPojo();
-        if (userDataPojo == null) {
-            //query from database userid
-            logger.warn("user data from request is null");
-        }
-
-        int amount = 3;
+        String username = directionsPojo.getUsername();
+        User user = userRepository.findFirstByUsername(username);
+        UserData userData = userDataRepository.findByUser(user);
+        int amount = directionsPojo.getNumberOfWaypoints();
         String assistantContent = "You are a travel guide recommending" + amount + " interesting locations based on the user's prompt data and between the starting and end destination.Your response should only return the name and address of the location";
         assistantMessage.setRole("assistant");
         assistantMessage.setContent(assistantContent);
         Message userMessage = new Message();
         userMessage.setRole("user");
-        String userContent = "user likes:" + (userDataPojo != null ? userDataPojo.keywordsToString() : "all kinds of places") + "; Origin:" + directionsPojo.getStartingPoint() + ". Destination: " + directionsPojo.getDestination() + " Your response should only return the name and address of the location";
+        String userContent = "user likes:" + (userData != null ? userData.getKeywordsLikes() : "all kinds of places") + "; Origin:" + directionsPojo.getStartingPoint() + ". Destination: " + directionsPojo.getDestination() + " Your response should only return the name and address of the location";
         userMessage.setContent(userContent);
         messages[1] = userMessage;
         messages[0] = assistantMessage;
@@ -465,17 +465,17 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
                 newLocation.setFormattedAddress(startingDestinationInfo[0].formattedAddress);
                 newLocation.setLongitude(startingDestinationInfo[0].geometry.location.lng);
                 newLocation.setLatitude(startingDestinationInfo[0].geometry.location.lat);
-                ViewPort newViewPort = new ViewPort(startingDestinationInfo[0].geometry.viewport.northeast, startingDestinationInfo[0].geometry.viewport.southwest);
-                newLocation.setViewPort(newViewPort);
-                Bounds newBounds = new Bounds(startingDestinationInfo[0].geometry.bounds.northeast, startingDestinationInfo[0].geometry.bounds.southwest);
-                newLocation.setBounds(newBounds);
-                newLocation.setName(startingDestinationInfo[0].formattedAddress);
-                newLocation.setGeometry(startingDestinationInfo[0].geometry);
+                //ViewPort newViewPort = new ViewPort(startingDestinationInfo[0].geometry.viewport.northeast, startingDestinationInfo[0].geometry.viewport.southwest);
+                //newLocation.setViewPort(newViewPort);
+                //Bounds newBounds = new Bounds(startingDestinationInfo[0].geometry.bounds.northeast, startingDestinationInfo[0].geometry.bounds.southwest);
+                //newLocation.setBounds(newBounds);
+                //newLocation.setName(startingDestinationInfo[0].formattedAddress);
+                //newLocation.setGeometry(startingDestinationInfo[0].geometry);
                 if (!checkIfLocationSaved(newLocation.getPlaceId())) {
                     locationsRepository.save(newLocation);
                 }
             } else {
-                newLocation = locationsRepository.findByLatitudeAndLongitude(directionsPojo.getStartingLatitude(), directionsPojo.getStartingLongitude());
+                newLocation = locationsRepository.findFirstByLatitudeAndLongitude(directionsPojo.getStartingLatitude(), directionsPojo.getStartingLongitude());
             }
 
         }
@@ -488,17 +488,17 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
                 newEndLocation.setFormattedAddress(endDestinationInfo[0].formattedAddress);
                 newEndLocation.setLongitude(endDestinationInfo[0].geometry.location.lng);
                 newEndLocation.setLatitude(endDestinationInfo[0].geometry.location.lat);
-                ViewPort newViewPort = new ViewPort(endDestinationInfo[0].geometry.viewport.northeast, endDestinationInfo[0].geometry.viewport.southwest);
-                newLocation.setViewPort(newViewPort);
-                Bounds newBounds = new Bounds(endDestinationInfo[0].geometry.bounds.northeast, endDestinationInfo[0].geometry.bounds.southwest);
-                newLocation.setBounds(newBounds);
-                newEndLocation.setName(endDestinationInfo[0].formattedAddress);
-                newEndLocation.setGeometry(endDestinationInfo[0].geometry);
+                //ViewPort newViewPort = new ViewPort(endDestinationInfo[0].geometry.viewport.northeast, endDestinationInfo[0].geometry.viewport.southwest);
+                //newLocation.setViewPort(newViewPort);
+                //Bounds newBounds = new Bounds(endDestinationInfo[0].geometry.bounds.northeast, endDestinationInfo[0].geometry.bounds.southwest);
+                //newLocation.setBounds(newBounds);
+                //newEndLocation.setName(endDestinationInfo[0].formattedAddress);
+                //newEndLocation.setGeometry(endDestinationInfo[0].geometry);
                 if (!checkIfLocationSaved(newEndLocation.getPlaceId())) {
                     locationsRepository.save(newEndLocation);
                 }
             } else {
-                newEndLocation = locationsRepository.findByFormattedAddress(directionsPojo.getDestination());
+                newEndLocation = locationsRepository.findFirstByFormattedAddress(directionsPojo.getDestination());
             }
         }
         //can optimize by using placeId to input the directions;
@@ -509,35 +509,31 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         chatRequest.setMax_tokens(120);
         Message[] messages = new Message[2];
         Message assistantMessage = new Message();
-        UserDataPojo userDataPojo = directionsPojo.getUserDataPojo();
-        if (userDataPojo == null) {
-            //query from database userid
-            logger.warn("user data from request is null");
-        }
-
-        int amount = 3;
+        String username = directionsPojo.getUsername();
+        User user = userRepository.findFirstByUsername(username);
+        UserData userData = userDataRepository.findByUser(user);
+        int amount = directionsPojo.getNumberOfWaypoints();
         String assistantContent = "You are a travel guide recommending" + amount + " interesting locations based on the user's prompt data and between the starting and end destination.Your response should only return the name and address of the location";
         assistantMessage.setRole("assistant");
         assistantMessage.setContent(assistantContent);
         Message userMessage = new Message();
         userMessage.setRole("user");
-        String userContent = "user likes:" + (userDataPojo != null ? userDataPojo.keywordsToString() : "all kinds of places") + "; Origin:" + directionsPojo.getStartingPoint() + ". Destination: " + directionsPojo.getDestination() + " Your response should only return the name and address of the location";
+        String userContent = "user likes:" + (userData != null ? userData.getKeywordsLikes() : "all kinds of places") + "; Origin:" + directionsPojo.getStartingPoint() + ". Destination: " + directionsPojo.getDestination() + " Your response should only return the name and address of the location";
         userMessage.setContent(userContent);
         messages[1] = userMessage;
         messages[0] = assistantMessage;
         chatRequest.setMessages(messages);
-        //ChatResponse generatedRecommendations = openAiWebAppImpl.outputRecommendations(chatRequest);
-        //logger.info("generated recommendations response from openAI {} ", generatedRecommendations);
+        ChatResponse generatedRecommendations = openAiWebAppImpl.outputRecommendations(chatRequest);
+        logger.info("generated recommendations response from openAI {} ", generatedRecommendations);
         //these lines process the lines of strings from chatGPT and outputs a list of locations information derived from those strings
-        //String[] stringAddresses = openAiWebAppImpl.processChatResponseObject(generatedRecommendations);
-        String[] stringAddresses = new String[]{"golden Chick, plano, TX ", "house of blues, dallas, texas", "rodeo goat, plano Texas"};
+        String[] stringAddresses = openAiWebAppImpl.processChatResponseObject(generatedRecommendations);
+        //String[] stringAddresses = new String[]{"golden Chick, plano, TX ", "house of blues, dallas, texas", "rodeo goat, plano Texas"};
         //TODO uncomment when done testing; Hard  code some values for testing to avoid api rate limit
         logger.info("stringAddress generated from openAI {} ", stringAddresses);
         List<PlacesSearchResult> chatGptRecommendationsGoogleInfo = googleMapsPlaceSearchFind(stringAddresses);
         List<Object> placesInfo = new ArrayList<>(chatGptRecommendationsGoogleInfo);
         placesInfo.add(newLocation);
         placesInfo.add(newEndLocation);
-        FindPlaceFromText startingPointPlaceInfo = new FindPlaceFromText();
         //figure out how to process this and return it in a neat fashion
         GoogleMapsDirectionsServiceRequest googleMapsDirectionsServiceRequest = new GoogleMapsDirectionsServiceRequest();
         //place_id: prefix all of them with this
@@ -546,8 +542,8 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         DirectionsWaypoint[] waypoints = new DirectionsWaypoint[chatGptRecommendationsGoogleInfo.size()];
         for (int i = 0; i < waypoints.length; i++) {
             DirectionsWaypoint point = new DirectionsWaypoint();
-            waypoints[i] = point;
             point.setLocation(chatGptRecommendationsGoogleInfo.get(i).placeId);
+            waypoints[i] = point;
         }
         logger.info("waypoints place ids {}", waypoints);
         googleMapsDirectionsServiceRequest.setWaypoints(waypoints);
@@ -556,33 +552,32 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         logger.info("request object for service request {}", googleMapsDirectionsServiceRequest);
         GoogleRenderDirectionsPOJO googleRenderDirectionsPOJO = new GoogleRenderDirectionsPOJO();
         googleRenderDirectionsPOJO.setGoogleMapsDirectionsServiceRequest(googleMapsDirectionsServiceRequest);
+        googleRenderDirectionsPOJO.setPlacesInfo(placesInfo);
         return googleRenderDirectionsPOJO;
     }
 
     public void saveUserFavLocation(SaveUserLocationPojo saveUserLocation) {
-        try{
-            User user = userRepository.findByUsername(saveUserLocation.getUsername());
+        try {
+            User user = userRepository.findFirstByUsername(saveUserLocation.getUsername());
             UserData userData = userDataRepository.findByUser(user);
             Set<String> userInterests = userData.getLocationsOfInterest();
             userInterests.add(saveUserLocation.getPlaceId());
             userData.setLocationsOfInterest(userInterests);
             userDataRepository.save(userData);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             logger.error(e);
         }
     }
 
     public void deleteUserFavLocation(SaveUserLocationPojo saveUserLocation) {
-        try{
-            User user = userRepository.findByUsername(saveUserLocation.getUsername());
+        try {
+            User user = userRepository.findFirstByUsername(saveUserLocation.getUsername());
             UserData userData = userDataRepository.findByUser(user);
             Set<String> userInterests = userData.getLocationsOfInterest();
             userInterests.remove(saveUserLocation.getPlaceId());
             userData.setLocationsOfInterest(userInterests);
             userDataRepository.save(userData);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             logger.error(e);
         }
     }

@@ -1,10 +1,10 @@
 package garcia.ruben.personal_project.utility.data;
 
 public enum Keywords {
-    Nature("nature"),
-    Luxury("luxury"),
-    History("history"),
-    Foodie("foodie");
+    Nature("Nature"),
+    Luxury("Luxury"),
+    History("History"),
+    Foodie("Foodie");
 
     private final String value;
 

@@ -9,5 +9,5 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DirectionsWaypoint {
     private String location;
-    private boolean stopover;
+    private boolean stopover = true;
 }

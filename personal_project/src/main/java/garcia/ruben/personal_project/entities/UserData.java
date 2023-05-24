@@ -1,11 +1,13 @@
 package garcia.ruben.personal_project.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import garcia.ruben.personal_project.utility.data.Keywords;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -20,27 +22,17 @@ public class UserData implements Serializable {
     @Id
     private int id;
 
+    @JsonBackReference
     @OneToOne
-    @JoinColumn(name = "user_id")
     private User user;
 
-    @Lob
-    @Column(columnDefinition = "text")
+
+    @CollectionTable(name = "user_keywords_like")
     private Set<Keywords> keywordsLikes = new HashSet<>();
 
-    @Lob
-    @Column(columnDefinition = "text")
-    private Set<Keywords> keywordsDislikes = new HashSet<>();
-
     //saved routes possibly won't be saved;
-    @Lob
-    @Column(columnDefinition = "text")
-    private List<LinkedList<String>> savedRoutes = new ArrayList<>();
 
-    @Lob
-    @Column(columnDefinition = "text")
+
+    @CollectionTable(name= "user_saved_locations")
     private Set<String> locationsOfInterest = new HashSet<>();
-
-    @Lob
-    private Set<String> locationsVisited = new HashSet<>();
 }

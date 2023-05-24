@@ -1,7 +1,6 @@
 package garcia.ruben.personal_project.pojos.location;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import garcia.ruben.personal_project.pojos.users.UserDataPojo;
 import lombok.*;
 
 @AllArgsConstructor
@@ -16,5 +15,6 @@ public class DirectionsPojo {
     private Double startingLongitude;
     private String destination;
     private String startingPoint;
-    private UserDataPojo userDataPojo;
+    private String username;
+    private int numberOfWaypoints = 3;
 }

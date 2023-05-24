@@ -5,6 +5,7 @@ import com.google.maps.model.Geometry;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 //used for google maps place id; if id is saved peformance is better;
@@ -17,7 +18,7 @@ import java.util.List;
 @Setter
 @Data
 @ToString
-public class Location {
+public class Location implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -28,22 +29,24 @@ public class Location {
     private String formattedAddress;
 
     private String name;
-    @Column(name = "view_port", columnDefinition = "text")
-    private ViewPort viewPort;
 
+    //@Column(name = "view_port", columnDefinition = "text")
+    //private ViewPort viewPort;
+    //TODO these types were causing problems with being deserialize; needed to update to support spatial data
 
-    @Column(name = "bounds", columnDefinition = "text")
-    private Bounds bounds;
+    //@Column(name = "bounds", columnDefinition = "text")
+   // private Bounds bounds;
 
     private Double latitude;
 
     private Double longitude;
 
-    @Column(columnDefinition = "text")
-    private Geometry geometry;
+    //@Column(columnDefinition = "text")
+    //private Geometry geometry;
 
     private String address;
-    @Column(columnDefinition = "text")
-    private List<String> types;
+    //@Column(columnDefinition = "text")
+    //private List<String> types;
+    //TODO deserialization error; will need to add an intermediate table for list; possible to make as clob
 
 }
