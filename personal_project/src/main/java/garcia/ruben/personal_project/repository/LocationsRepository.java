@@ -9,4 +9,6 @@ public interface LocationsRepository extends JpaRepository<Location, Integer> {
     Location findByLatitudeAndLongitude(Double latitude, Double longitude);
 
     Location findByPlaceId(String placeId);
+
+    Location findByFormattedAddress(String formattedAddress);
 }

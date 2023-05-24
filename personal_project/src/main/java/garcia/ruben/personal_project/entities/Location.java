@@ -28,8 +28,6 @@ public class Location {
     private String formattedAddress;
 
     private String name;
-
-
     @Column(name = "view_port", columnDefinition = "text")
     private ViewPort viewPort;
 
@@ -41,6 +39,7 @@ public class Location {
 
     private Double longitude;
 
+    @Column(columnDefinition = "text")
     private Geometry geometry;
 
     private String address;
