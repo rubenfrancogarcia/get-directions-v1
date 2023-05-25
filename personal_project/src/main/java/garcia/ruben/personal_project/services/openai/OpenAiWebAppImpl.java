@@ -65,6 +65,7 @@ public class OpenAiWebAppImpl implements OpenAiInterface {
             logger.error(e);
             throw new RuntimeException(e);
         }
+        logger.info("open ai completion response {}", chatResponseObject.getChoices());
         return chatResponseObject;
     }
 
@@ -72,6 +73,7 @@ public class OpenAiWebAppImpl implements OpenAiInterface {
         Choices[] choices = chatResponse.getChoices();
         Message message = choices[0].getMessage();
         String recommendation = message.getContent();
+        logger.info("reformated response of content" +  recommendation);
         return recommendation.split("\n");
     }
 

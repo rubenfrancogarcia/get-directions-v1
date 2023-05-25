@@ -222,6 +222,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
     public PlacesSearchResult googleMapsPlaceSearchFind(String place) {
         //custom url for desired locations info https://maps.googleapis.com/maps/api/place/findplacefromtext/json?fields=formatted_address%2Cname%2Cgeometry%2Cplace_id%2Ctype&input=Museum%20of%20Contemporary%20Art%20Australia&inputtype=textquery&key=YOUR_API_KEY
         FindPlaceFromText result = null;
+        logger.info("geocoding string input" + place);
         try {
             result = PlacesApi.findPlaceFromText(geoApiContextInstance, place, FindPlaceFromTextRequest.InputType.TEXT_QUERY)
                     .fields(
@@ -266,10 +267,16 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         //custom url for desired locations info https://maps.googleapis.com/maps/api/place/findplacefromtext/json?fields=formatted_address%2Cname%2Cgeometry%2Cplace_id%2Ctype&input=Museum%20of%20Contemporary%20Art%20Australia&inputtype=textquery&key=YOUR_API_KEY
         //format for place lookup
         List<PlacesSearchResult> results = new ArrayList<>();
+        logger.info("string of places generated from open AI", places);
         // PlacesSearchResult candidate = response.candidates[0];
         for (String string : places) {
-            PlacesSearchResult result = googleMapsPlaceSearchFind(string);
-            results.add(result);
+            try{
+                PlacesSearchResult result = googleMapsPlaceSearchFind(string);
+                results.add(result);
+            }catch(Exception e){
+                logger.error("recommendation format generated error");
+                //TODO if fails then need to implement logic to find another location, or implement some logic to find nearby points to generate more locations
+            }
         }
         return results;
     }
@@ -455,7 +462,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
 
     //this service is for our page that will render the directions and provide additional information for said places
     public GoogleRenderDirectionsPOJO provideRenderingServiceInformation(DirectionsPojo directionsPojo) {
-        //todo check if starting and ending location is there if it's saved in locations table then use the placeId
+        //but in case if user does not want to use default device location we must use Geolocation api to query details then save;
         Location newLocation = null;
         if (directionsPojo.getStartingLongitude() != null && directionsPojo.getStartingLatitude() != null) {
             if (!checkIfLocationSaved(directionsPojo.getStartingLatitude(), directionsPojo.getStartingLongitude())) {
@@ -477,35 +484,47 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
             } else {
                 newLocation = locationsRepository.findFirstByLatitudeAndLongitude(directionsPojo.getStartingLatitude(), directionsPojo.getStartingLongitude());
             }
-
+        } else {
+            GeocodingResult[] startingLocation = getLocation(directionsPojo.getStartingPoint());
+            if (startingLocation.length > 0) {
+                newLocation = new Location();
+                newLocation.setPlaceId(startingLocation[0].placeId);
+                newLocation.setFormattedAddress(startingLocation[0].formattedAddress);
+                newLocation.setLongitude(startingLocation[0].geometry.location.lng);
+                newLocation.setLatitude(startingLocation[0].geometry.location.lat);
+                newLocation.setAddress(directionsPojo.getStartingPoint());
+                if (!checkIfLocationSaved(newLocation.getPlaceId())) {
+                    locationsRepository.save(newLocation);
+                }
+            } else {
+                throw new RuntimeException("no valid destination returned");
+            }
         }
         GeocodingResult[] endDestinationInfo = getLocation(directionsPojo.getDestination());
         Location newEndLocation = null;
         if (endDestinationInfo.length > 0) {
-            if (!checkIfLocationSaved(directionsPojo.getDestination())) {
-                newEndLocation = new Location();
-                newEndLocation.setPlaceId(endDestinationInfo[0].placeId);
-                newEndLocation.setFormattedAddress(endDestinationInfo[0].formattedAddress);
-                newEndLocation.setLongitude(endDestinationInfo[0].geometry.location.lng);
-                newEndLocation.setLatitude(endDestinationInfo[0].geometry.location.lat);
-                //ViewPort newViewPort = new ViewPort(endDestinationInfo[0].geometry.viewport.northeast, endDestinationInfo[0].geometry.viewport.southwest);
-                //newLocation.setViewPort(newViewPort);
-                //Bounds newBounds = new Bounds(endDestinationInfo[0].geometry.bounds.northeast, endDestinationInfo[0].geometry.bounds.southwest);
-                //newLocation.setBounds(newBounds);
-                //newEndLocation.setName(endDestinationInfo[0].formattedAddress);
-                //newEndLocation.setGeometry(endDestinationInfo[0].geometry);
-                if (!checkIfLocationSaved(newEndLocation.getPlaceId())) {
-                    locationsRepository.save(newEndLocation);
-                }
-            } else {
-                newEndLocation = locationsRepository.findFirstByFormattedAddress(directionsPojo.getDestination());
+            newEndLocation = new Location();
+            newEndLocation.setPlaceId(endDestinationInfo[0].placeId);
+            newEndLocation.setFormattedAddress(endDestinationInfo[0].formattedAddress);
+            newEndLocation.setLongitude(endDestinationInfo[0].geometry.location.lng);
+            newEndLocation.setLatitude(endDestinationInfo[0].geometry.location.lat);
+            //ViewPort newViewPort = new ViewPort(endDestinationInfo[0].geometry.viewport.northeast, endDestinationInfo[0].geometry.viewport.southwest);
+            //newLocation.setViewPort(newViewPort);
+            //Bounds newBounds = new Bounds(endDestinationInfo[0].geometry.bounds.northeast, endDestinationInfo[0].geometry.bounds.southwest);
+            //newLocation.setBounds(newBounds);
+            //newEndLocation.setName(endDestinationInfo[0].formattedAddress);
+            //newEndLocation.setGeometry(endDestinationInfo[0].geometry);
+            if (!checkIfLocationSaved(newEndLocation.getPlaceId())) {
+                locationsRepository.save(newEndLocation);
             }
+        } else {
+            throw new RuntimeException("no valid destination returned");
         }
         //can optimize by using placeId to input the directions;
         //and use geocodoing api to find info
         ChatRequest chatRequest = new ChatRequest();
         chatRequest.setModel("gpt-3.5-turbo");
-        chatRequest.setTemperature(1.1);
+        chatRequest.setTemperature(0.8);
         chatRequest.setMax_tokens(120);
         Message[] messages = new Message[2];
         Message assistantMessage = new Message();
@@ -513,12 +532,12 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         User user = userRepository.findFirstByUsername(username);
         UserData userData = userDataRepository.findByUser(user);
         int amount = directionsPojo.getNumberOfWaypoints();
-        String assistantContent = "You are a travel guide recommending" + amount + " interesting locations based on the user's prompt data and between the starting and end destination.Your response should only return the name and address of the location";
+        String assistantContent = "You are a travel guide recommending " + amount + " interesting locations based on the user's prompt data and between the starting and end destination. The response should only return the name and address of the location";
         assistantMessage.setRole("assistant");
         assistantMessage.setContent(assistantContent);
         Message userMessage = new Message();
         userMessage.setRole("user");
-        String userContent = "user likes:" + (userData != null ? userData.getKeywordsLikes() : "all kinds of places") + "; Origin:" + directionsPojo.getStartingPoint() + ". Destination: " + directionsPojo.getDestination() + " Your response should only return the name and address of the location";
+        String userContent = "user likes:" + (userData != null ? userData.getKeywordsLikes() : "all kinds of places") + "; Origin:" + newLocation.getFormattedAddress() + ". Destination: " + newEndLocation.getFormattedAddress() + " Your response should only return the name and address of the location";
         userMessage.setContent(userContent);
         messages[1] = userMessage;
         messages[0] = assistantMessage;

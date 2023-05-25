@@ -69,7 +69,7 @@ public class UserManagementWebAppImpl implements UserManagementInterface {
         } catch (Exception e) {
             logger.error(e);
         }
-        return "retry";
+        return "retry with different username or phone number or email";
     }
 
     @Override
