@@ -34,5 +34,6 @@ public class UserData implements Serializable {
 
 
     @CollectionTable(name= "user_saved_locations")
+    @ElementCollection
     private Set<String> locationsOfInterest = new HashSet<>();
 }

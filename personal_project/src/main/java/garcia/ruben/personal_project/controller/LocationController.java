@@ -3,10 +3,7 @@ package garcia.ruben.personal_project.controller;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.model.GeocodingResult;
 import com.google.maps.model.PlacesSearchResult;
-import garcia.ruben.personal_project.pojos.location.DirectionsPojo;
-import garcia.ruben.personal_project.pojos.location.GoogleMapsDirectionsServiceRequest;
-import garcia.ruben.personal_project.pojos.location.GoogleRenderDirectionsPOJO;
-import garcia.ruben.personal_project.pojos.location.SaveUserLocationPojo;
+import garcia.ruben.personal_project.pojos.location.*;
 import garcia.ruben.personal_project.services.location.GoogleMapsLocationsWebAppImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173/")
+@CrossOrigin
 @RequestMapping(value = "/V1/Locations")
 public class LocationController {
     private static final Logger logger = LogManager.getLogger(LocationController.class);
@@ -57,8 +54,15 @@ public class LocationController {
 
     @PostMapping("/SaveFavoriteLocation")
     public ResponseEntity<?> saveFavoriteLocation(@RequestBody SaveUserLocationPojo saveUserLocation) {
-        googleMapsLocationsWebApp.saveUserFavLocation(saveUserLocation);
-        return new ResponseEntity<>(HttpStatus.OK);
+
+        String result = googleMapsLocationsWebApp.saveUserFavLocation(saveUserLocation);
+        if (result.equalsIgnoreCase("success")) {
+            SuccessPojo successPojo = new SuccessPojo();
+            successPojo.setResponse("success");
+            return new ResponseEntity<>(successPojo, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/DeleteFavoriteLocation")

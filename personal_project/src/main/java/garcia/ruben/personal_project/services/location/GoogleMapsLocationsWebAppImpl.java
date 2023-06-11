@@ -270,10 +270,10 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         logger.info("string of places generated from open AI", places);
         // PlacesSearchResult candidate = response.candidates[0];
         for (String string : places) {
-            try{
+            try {
                 PlacesSearchResult result = googleMapsPlaceSearchFind(string);
                 results.add(result);
-            }catch(Exception e){
+            } catch (Exception e) {
                 logger.error("recommendation format generated error");
                 //TODO if fails then need to implement logic to find another location, or implement some logic to find nearby points to generate more locations
             }
@@ -560,6 +560,9 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         googleMapsDirectionsServiceRequest.setOrigin(newLocation.getPlaceId());
         DirectionsWaypoint[] waypoints = new DirectionsWaypoint[chatGptRecommendationsGoogleInfo.size()];
         for (int i = 0; i < waypoints.length; i++) {
+            if (chatGptRecommendationsGoogleInfo.get(i).placeId == null) {
+                continue;
+            }
             DirectionsWaypoint point = new DirectionsWaypoint();
             point.setLocation(chatGptRecommendationsGoogleInfo.get(i).placeId);
             waypoints[i] = point;
@@ -575,7 +578,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         return googleRenderDirectionsPOJO;
     }
 
-    public void saveUserFavLocation(SaveUserLocationPojo saveUserLocation) {
+    public String saveUserFavLocation(SaveUserLocationPojo saveUserLocation) {
         try {
             User user = userRepository.findFirstByUsername(saveUserLocation.getUsername());
             UserData userData = userDataRepository.findByUser(user);
@@ -583,8 +586,10 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
             userInterests.add(saveUserLocation.getPlaceId());
             userData.setLocationsOfInterest(userInterests);
             userDataRepository.save(userData);
+            return "success";
         } catch (Exception e) {
             logger.error(e);
+            return "failure";
         }
     }
 
