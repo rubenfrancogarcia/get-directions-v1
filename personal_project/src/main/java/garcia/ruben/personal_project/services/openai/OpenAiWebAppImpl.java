@@ -61,11 +61,11 @@ public class OpenAiWebAppImpl implements OpenAiInterface {
 
         try {
             chatResponseObject = objectMapper.readValue(response, ChatResponse.class);
+            logger.info("response of content {}", chatResponseObject.getChoices()[0].getMessage().getContent());
         } catch (JsonProcessingException e) {
             logger.error(e);
             throw new RuntimeException(e);
         }
-        logger.info("open ai completion response {}", chatResponseObject.getChoices());
         return chatResponseObject;
     }
 
