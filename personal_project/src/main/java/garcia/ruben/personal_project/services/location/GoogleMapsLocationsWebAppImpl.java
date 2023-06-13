@@ -231,7 +231,9 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
                             FindPlaceFromTextRequest.FieldMask.FORMATTED_ADDRESS,
                             FindPlaceFromTextRequest.FieldMask.NAME,
                             FindPlaceFromTextRequest.FieldMask.TYPES,
-                            FindPlaceFromTextRequest.FieldMask.GEOMETRY
+                            FindPlaceFromTextRequest.FieldMask.RATING,
+                            FindPlaceFromTextRequest.FieldMask.GEOMETRY,
+                            FindPlaceFromTextRequest.FieldMask.PHOTOS
                     ).locationBias(new FindPlaceFromTextRequest.LocationBiasIP())
                     //location Bias can be used to restrict candidates
                     .await();
@@ -619,7 +621,53 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
             logger.error(e);
         }
     }
-}
 
+    public List<PlaceDetails> generateSavedLocationsInfo(String username) {
+        try {
+            User user = userRepository.findFirstByUsername(username);
+            UserData userData = userDataRepository.findByUser(user);
+            logger.info("user info {}, userData {}", user, userData.getLocationsOfInterest());
+            Set<String> userInterests = userData.getLocationsOfInterest();
+            logger.info("user interests {}", userInterests);
+            List<PlaceDetails> placesSearchResults = new ArrayList<>();
+            for (String placeId : userInterests) {
+                PlaceDetails placesSearchResult = googleMapsPlaceDetail(placeId);
+                placesSearchResults.add(placesSearchResult);
+            }
+            return placesSearchResults;
+        } catch (Exception e) {
+            logger.error(e);
+            return null;
+        }
+    }
+
+    public PlaceDetails googleMapsPlaceDetail(String place) {
+        //custom url for desired locations info https://maps.googleapis.com/maps/api/place/findplacefromtext/json?fields=formatted_address%2Cname%2Cgeometry%2Cplace_id%2Ctype&input=Museum%20of%20Contemporary%20Art%20Australia&inputtype=textquery&key=YOUR_API_KEY
+        PlaceDetails result = null;
+        logger.info("geocoding string input" + place);
+        try {
+            result = PlacesApi.placeDetails(geoApiContextInstance, place)
+                    .fields(
+                            PlaceDetailsRequest.FieldMask.FORMATTED_ADDRESS,
+                            PlaceDetailsRequest.FieldMask.EDITORIAL_SUMMARY,
+                            PlaceDetailsRequest.FieldMask.RATING,
+                            PlaceDetailsRequest.FieldMask.USER_RATINGS_TOTAL,
+                            PlaceDetailsRequest.FieldMask.WEBSITE,
+                            PlaceDetailsRequest.FieldMask.PHOTOS,
+                            PlaceDetailsRequest.FieldMask.GEOMETRY,
+                            PlaceDetailsRequest.FieldMask.NAME,
+                            PlaceDetailsRequest.FieldMask.PLACE_ID,
+                            PlaceDetailsRequest.FieldMask.TYPES
+                    ).await();
+            if (result != null) {
+                logger.info("geocoding result" + result);
+                return result;
+            }
+        } catch (Exception e) {
+            logger.error(e);
+        }
+        return null;
+    }
+}
 
 

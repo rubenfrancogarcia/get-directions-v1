@@ -5,6 +5,7 @@ import com.google.maps.model.GeocodingResult;
 import com.google.maps.model.PlacesSearchResult;
 import garcia.ruben.personal_project.pojos.location.*;
 import garcia.ruben.personal_project.services.location.GoogleMapsLocationsWebAppImpl;
+import jakarta.websocket.server.PathParam;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,11 @@ public class LocationController {
     public ResponseEntity<?> deleteFavoriteLocation(@RequestBody SaveUserLocationPojo deleteUserLocation) {
         googleMapsLocationsWebApp.deleteUserFavLocation(deleteUserLocation);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/GetFavoriteLocations")
+    public ResponseEntity<?> getFavoriteLocations(@RequestParam String username) {
+        return new ResponseEntity<>(googleMapsLocationsWebApp.generateSavedLocationsInfo(username), HttpStatus.OK);
     }
 
 }
