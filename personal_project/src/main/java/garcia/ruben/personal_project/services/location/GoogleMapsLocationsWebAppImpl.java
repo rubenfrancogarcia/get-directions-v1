@@ -470,6 +470,10 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         Location newLocation = null;
         if (directionsPojo.getStartingLongitude() != null && directionsPojo.getStartingLatitude() != null) {
             if (!checkIfLocationSaved(directionsPojo.getStartingLatitude(), directionsPojo.getStartingLongitude())) {
+                if (directionsPojo.getStartingPoint() == null) {
+                    throw new Error("starting point is null and no matching location found with the coordinates provided Lat: " + directionsPojo.getStartingLatitude() + ", Longitude: " + directionsPojo.getStartingLongitude() +
+                            "please provide a starting point");
+                }
                 newLocation = new Location();
                 GeocodingResult[] startingDestinationInfo = getLocation(directionsPojo.getStartingPoint());
                 newLocation.setPlaceId(startingDestinationInfo[0].placeId);
