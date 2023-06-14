@@ -232,8 +232,7 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
                             FindPlaceFromTextRequest.FieldMask.NAME,
                             FindPlaceFromTextRequest.FieldMask.TYPES,
                             FindPlaceFromTextRequest.FieldMask.RATING,
-                            FindPlaceFromTextRequest.FieldMask.GEOMETRY,
-                            FindPlaceFromTextRequest.FieldMask.PHOTOS
+                            FindPlaceFromTextRequest.FieldMask.GEOMETRY
                     ).locationBias(new FindPlaceFromTextRequest.LocationBiasIP())
                     //location Bias can be used to restrict candidates
                     .await();
@@ -336,12 +335,12 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         //and use geocodoing api to find info
         ChatRequest chatRequest = new ChatRequest();
         chatRequest.setModel("gpt-3.5-turbo");
-        chatRequest.setTemperature(1.1);
+        chatRequest.setTemperature(1.3);
         chatRequest.setMax_tokens(120);
         Message[] messages = new Message[2];
         Message assistantMessage = new Message();
         String username = directionsPojo.getUsername();
-        User user = userRepository.findFirstByUsername(username);
+        User user = userRepository.findByUsername(username);
         UserData userData = userDataRepository.findByUser(user);
         int amount = directionsPojo.getNumberOfWaypoints();
         if (amount > 9) {
@@ -420,20 +419,20 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         //and use geocodoing api to find info
         ChatRequest chatRequest = new ChatRequest();
         chatRequest.setModel("gpt-3.5-turbo");
-        chatRequest.setTemperature(1.1);
-        chatRequest.setMax_tokens(120);
+        chatRequest.setTemperature(0.9);
+        chatRequest.setMax_tokens(200);
         Message[] messages = new Message[2];
         Message assistantMessage = new Message();
         String username = directionsPojo.getUsername();
         User user = userRepository.findFirstByUsername(username);
         UserData userData = userDataRepository.findByUser(user);
         int amount = directionsPojo.getNumberOfWaypoints();
-        String assistantContent = "You are a travel guide recommending" + amount + " interesting locations based on the user's prompt data and between the starting and end destination.Your response should only return the name and address of the location";
+        String assistantContent = "You are a travel guide. Recommend me " + amount + " locations based on the user's prompt data and along between the starting and end destination. Try your best. Your response should only return " + amount +"different locations' name and address";
         assistantMessage.setRole("assistant");
         assistantMessage.setContent(assistantContent);
         Message userMessage = new Message();
         userMessage.setRole("user");
-        String userContent = "user likes:" + (userData != null ? userData.getKeywordsLikes() : "all kinds of places") + "; Origin:" + directionsPojo.getStartingPoint() + ". Destination: " + directionsPojo.getDestination() + " Your response should only return the name and address of the location";
+        String userContent = "user likes:" + (userData != null && userData.getKeywordsLikes().size() > 0 ? userData.getKeywordsLikes().toString() + "types of locations" : "all kinds of locations") + "; Origin:" + directionsPojo.getStartingPoint() + ". Destination: " + directionsPojo.getDestination() + " Your response should only return the name and address of the amount of locations specified ";
         userMessage.setContent(userContent);
         messages[1] = userMessage;
         messages[0] = assistantMessage;
@@ -532,15 +531,15 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
         //and use geocodoing api to find info
         ChatRequest chatRequest = new ChatRequest();
         chatRequest.setModel("gpt-3.5-turbo");
-        chatRequest.setTemperature(0.7);
-        chatRequest.setMax_tokens(120);
+        chatRequest.setTemperature(1.2);
+        chatRequest.setMax_tokens(150);
         Message[] messages = new Message[2];
         Message assistantMessage = new Message();
         String username = directionsPojo.getUsername();
         User user = userRepository.findFirstByUsername(username);
         UserData userData = userDataRepository.findByUser(user);
         int amount = directionsPojo.getNumberOfWaypoints();
-        String assistantContent = "You are a travel guide recommending " + amount + " interesting locations based on the user's prompt data and between the starting and end destination. The response should only return the name and address of the location";
+        String assistantContent = "You are a travel guide recommending" +amount+"locations based on the user's prompt data that are BETWEEN the starting and end destination nothing past either of them. It's okay if it's not efficient. The response should only return the name and address of the location because I am using java to separate the data based on the comma between the name and address. It's important your response should only return your recommendations, no commentary. Nothing else";
         assistantMessage.setRole("assistant");
         assistantMessage.setContent(assistantContent);
         Message userMessage = new Message();
@@ -554,9 +553,9 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
             }
             interests = sb.toString();
         } else {
-            interests = "anything interesting";
+            interests = "anything you like";
         }
-        String userContent = "user likes:" + interests + "; Origin:" + newLocation.getFormattedAddress() + ". Destination: " + newEndLocation.getFormattedAddress() + " Your response should only return the name and address of the location";
+        String userContent = "user wants to drive to :" + interests + "types of locations; They don't mind if it's a little out the way but it must be in the direction of their destination. Origin:" + newLocation.getFormattedAddress() + ". Destination is: " + newEndLocation.getFormattedAddress() + ".The response should only return the name and address of the location because I am using java to separate the data based on the comma between the name and address. It's important your response should only return your recommendations, no commentary. Nothing else";
         userMessage.setContent(userContent);
         messages[1] = userMessage;
         messages[0] = assistantMessage;
@@ -657,8 +656,6 @@ public class GoogleMapsLocationsWebAppImpl implements GoogleMapsLocationsInterfa
                             PlaceDetailsRequest.FieldMask.RATING,
                             PlaceDetailsRequest.FieldMask.USER_RATINGS_TOTAL,
                             PlaceDetailsRequest.FieldMask.WEBSITE,
-                            PlaceDetailsRequest.FieldMask.PHOTOS,
-                            PlaceDetailsRequest.FieldMask.GEOMETRY,
                             PlaceDetailsRequest.FieldMask.NAME,
                             PlaceDetailsRequest.FieldMask.PLACE_ID,
                             PlaceDetailsRequest.FieldMask.TYPES

@@ -16,5 +16,5 @@ public class DirectionsPojo {
     private String destination;
     private String startingPoint;
     private String username;
-    private int numberOfWaypoints = 3;
+    private int numberOfWaypoints;
 }

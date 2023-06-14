@@ -2,10 +2,7 @@ package garcia.ruben.personal_project.services.usermanagement;
 
 import garcia.ruben.personal_project.entities.User;
 import garcia.ruben.personal_project.entities.UserData;
-import garcia.ruben.personal_project.pojos.users.LogInRequest;
-import garcia.ruben.personal_project.pojos.users.LoginUserPojo;
-import garcia.ruben.personal_project.pojos.users.RegisterUserPojo;
-import garcia.ruben.personal_project.pojos.users.UpdateDataPojo;
+import garcia.ruben.personal_project.pojos.users.*;
 import garcia.ruben.personal_project.repository.UserDataRepository;
 import garcia.ruben.personal_project.repository.UserRepository;
 import garcia.ruben.personal_project.utility.security.Security;
@@ -35,7 +32,7 @@ public class UserManagementWebAppImpl implements UserManagementInterface {
 
     @Override
     public LoginUserPojo login(LogInRequest credentialsPojo) {
-        User user = userRepository.findFirstByUsername(credentialsPojo.getUsername());
+        User user = userRepository.findByUsername(credentialsPojo.getUsername());
         if (user != null) {
             if (passwordEncoder.matches(credentialsPojo.getPassword(), user.getPassword())) {
                 LoginUserPojo loginUserPojo = new LoginUserPojo();
@@ -75,7 +72,7 @@ public class UserManagementWebAppImpl implements UserManagementInterface {
     @Override
     public UpdateDataPojo updateUserData(UpdateDataPojo updateDataPojo) {
         try {
-            User user = userRepository.findFirstByUsername(updateDataPojo.getUsername());
+            User user = userRepository.findByUsername(updateDataPojo.getUsername());
             UserData userData = userDataRepository.findByUser(user);
             userData.setKeywordsLikes(updateDataPojo.getKeywordsLikes());
             userData.setLocationsOfInterest(updateDataPojo.getLocationsOfInterest());
@@ -85,6 +82,21 @@ public class UserManagementWebAppImpl implements UserManagementInterface {
             logger.error(e);
         }
         return null;
+    }
+
+    public void updateUserInfo(UserPojo userPojo){
+        try {
+            User user = userRepository.findByUsername(userPojo.getUsername());
+            user.setPassword(passwordEncoder.encode(userPojo.getPassword()));
+            user.setFirstName(userPojo.getFirstName());
+            user.setLastName(userPojo.getLastName());
+            user.setEmail(userPojo.getEmail());
+            user.setPhoneNumber(userPojo.getPhoneNumber());
+            userRepository.save(user);
+            logger.info("user updated");
+        } catch (Exception e) {
+            logger.error(e);
+        }
     }
 
     @Override

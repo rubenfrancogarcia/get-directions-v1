@@ -49,9 +49,14 @@ public class UserController {
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/UpdateUser={userId}")
-    public ResponseEntity<?> updateUserData(@RequestBody UserDataPojo userDataPojo, @PathVariable("userId") int userId) {
-        return new ResponseEntity<>(null, HttpStatus.OK);
+    @PostMapping(value = "/UpdateUser")
+    public ResponseEntity<?> updateUserData(@RequestBody UserPojo user) {
+        try {
+            userManagementWebApp.updateUserInfo(user);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping(value = "/DeleteUser={userId}")
